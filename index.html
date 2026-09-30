@@ -1,0 +1,2364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1b5e20">
+<meta name="description" content="YMM مصر في جيبك - دليل الخدمات والمجتمع المحلي في مصر">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="YMM مصر">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231b5e20' width='100' height='100' rx='20'/><text x='50' y='62' font-size='36' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>YMM</text></svg>">
+<title>YMM مصر في جيبك</title>
+<script>
+/* Inline PWA Manifest — single file */
+(function(){
+  var manifest = {
+    name: "YMM مصر في جيبك",
+    short_name: "YMM مصر",
+    description: "دليل الخدمات والمجتمع المحلي في مصر",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#1b5e20",
+    theme_color: "#1b5e20",
+    orientation: "portrait-primary",
+    lang: "ar",
+    dir: "rtl",
+    icons: [{
+      src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%231b5e20' width='192' height='192' rx='40'/><text x='96' y='118' font-size='56' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>YMM</text></svg>",
+      sizes: "192x192",
+      type: "image/svg+xml",
+      purpose: "any maskable"
+    }]
+  };
+  var blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  var link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+})();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root {
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --text2: #667781;
+  --border: #e9edef;
+  --input-bg: #f0f2f5;
+  --primary: #1b5e20;
+  --primary2: #2e7d32;
+  --primary-light: #e8f5e9;
+  --header-bg: #ffffff;
+  --nav-bg: #ffffff;
+  --msg-other: #ffffff;
+  --msg-me: #d9fdd3;
+  --chat-bg: #efeae2;
+  --shadow: rgba(11,20,26,.08);
+  --danger: #e53935;
+  --warning: #ff9800;
+  --info: #1976d2;
+  --success: #2e7d32;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --transition: .25s ease;
+}
+body.dark {
+  --bg: #0b141a;
+  --card: #1f2c34;
+  --text: #e9edef;
+  --text2: #8696a0;
+  --border: #2a3942;
+  --input-bg: #2a3942;
+  --primary: #4caf50;
+  --primary2: #66bb6a;
+  --primary-light: #1b3a1e;
+  --header-bg: #1f2c34;
+  --nav-bg: #1f2c34;
+  --msg-other: #1f2c34;
+  --msg-me: #005c4b;
+  --chat-bg: #0b141a;
+  --shadow: rgba(0,0,0,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;overflow-x:hidden;transition:background var(--transition),color var(--transition);line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{max-width:480px;margin:0 auto;background:var(--card);min-height:100vh;min-height:100dvh;position:relative;box-shadow:0 0 40px var(--shadow)}
+@media(min-width:768px){.app{max-width:720px;box-shadow:0 0 60px var(--shadow)}}
+@media(min-width:1024px){.app{max-width:900px}}
+
+/* Header */
+.header{background:var(--header-bg);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;gap:8px}
+.header .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;color:var(--text);min-width:0}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;flex-shrink:0}
+.header-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;background:var(--input-bg);color:var(--text);transition:transform .15s,background var(--transition);position:relative}
+.icon-btn:active{transform:scale(.92)}
+.icon-btn.red{background:#ff5252;color:#fff}
+.icon-btn.gray{background:var(--input-bg);color:var(--text2);font-size:12px;width:auto;padding:0 10px;border-radius:18px}
+.badge-dot{position:absolute;top:4px;left:4px;width:9px;height:9px;background:var(--danger);border-radius:50%;border:2px solid var(--card)}
+.user-chip{font-size:12px;background:var(--input-bg);padding:5px 10px;border-radius:14px;color:var(--text2);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+
+/* Search */
+.search-bar{padding:10px 14px;background:var(--header-bg)}
+.search-box{display:flex;align-items:center;background:var(--input-bg);border-radius:24px;padding:10px 14px;gap:8px;border:1px solid transparent;transition:border var(--transition)}
+.search-box:focus-within{border-color:var(--primary)}
+.search-box input{border:none;background:transparent;outline:none;flex:1;font-size:14px;color:var(--text);min-width:0}
+.search-box .clear-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;padding:2px 6px;display:none}
+.search-box.has-value .clear-btn{display:block}
+
+/* Categories */
+.cats{display:flex;gap:8px;padding:0 14px 12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cats::-webkit-scrollbar{display:none}
+.cat{white-space:nowrap;padding:7px 14px;border-radius:20px;background:var(--input-bg);font-size:13px;cursor:pointer;border:none;font-weight:600;color:var(--text);transition:background var(--transition),color var(--transition);font-family:inherit}
+.cat.active{background:var(--primary);color:#fff}
+.cat:active{opacity:.85}
+
+/* Sections */
+.section-title{padding:14px 16px 8px;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:space-between;gap:6px;color:var(--text)}
+.section-title .see-all{font-size:12px;color:var(--primary);font-weight:600;cursor:pointer;background:none;border:none;font-family:inherit}
+
+/* Cards */
+.service-card{margin:0 14px 12px;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px var(--shadow);cursor:pointer;border:1px solid var(--border);transition:transform .15s,box-shadow var(--transition)}
+.service-card:active{transform:scale(.98)}
+.service-img{height:130px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;position:relative;font-size:48px;overflow:hidden}
+body.dark .service-img{background:linear-gradient(135deg,#1b3a1e,#2e4a30)}
+.service-img img{width:100%;height:100%;object-fit:cover}
+.service-img .badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.65);color:#fff;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600}
+.service-img .fav-btn{position:absolute;top:8px;left:8px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+body.dark .service-img .fav-btn{background:rgba(30,30,30,.9)}
+.service-body{padding:12px 14px}
+.service-name{font-weight:700;font-size:15px;margin-bottom:4px;line-height:1.35;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.service-rating{display:inline-flex;align-items:center;gap:3px;background:#ffc107;color:#000;padding:2px 8px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:6px}
+.service-meta{font-size:12px;color:var(--text2);margin:3px 0;display:flex;align-items:center;gap:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.open-badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:600;margin-top:4px}
+.open-badge.open{background:#e8f5e9;color:#1b5e20}
+.open-badge.closed{background:#ffebee;color:#c62828}
+body.dark .open-badge.open{background:#1b3a1e;color:#81c784}
+body.dark .open-badge.closed{background:#3e2723;color:#ef9a9a}
+
+/* Buttons */
+.btn{padding:10px 16px;border-radius:var(--radius-sm);border:none;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:scale(.97);opacity:.9}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-green{background:var(--primary2);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-full{width:100%}
+.btn-orange{background:var(--warning);color:#fff}
+.btn-red{background:var(--danger);color:#fff}
+.btn-blue{background:var(--info);color:#fff}
+.btn-whatsapp{background:#25d366;color:#fff}
+.btn-call{background:#1976d2;color:#fff}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:var(--nav-bg);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:6px 0 max(10px,env(safe-area-inset-bottom));z-index:200}
+@media(min-width:768px){.bottom-nav{max-width:720px}}
+@media(min-width:1024px){.bottom-nav{max-width:900px}}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:10px;color:var(--text2);cursor:pointer;background:none;border:none;font-family:inherit;padding:4px 8px;min-width:56px;transition:color var(--transition)}
+.nav-item.active{color:var(--primary);font-weight:700}
+.nav-item span{font-size:22px;line-height:1.2}
+
+/* Pages */
+.page{display:none;padding-bottom:80px;min-height:100vh;min-height:100dvh;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:.6}to{opacity:1}}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:none;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(2px)}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 20px max(24px,env(safe-area-inset-bottom));color:var(--text);max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-box.center{border-radius:16px;margin:20px;max-width:360px;align-self:center}
+.modal-box input,.modal-box textarea,.modal-box select{width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin:6px 0;font-size:14px;background:var(--input-bg);color:var(--text);font-family:inherit;outline:none}
+.modal-box input:focus,.modal-box textarea:focus{border-color:var(--primary)}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:12px;text-align:center}
+
+/* Forms */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--text2)}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;outline:none;background:var(--input-bg);color:var(--text);font-family:inherit;transition:border var(--transition)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary)}
+.form-hint{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* Chat */
+.chat-header{background:var(--header-bg);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50}
+.chat-messages{padding:16px;height:calc(100vh - 170px);height:calc(100dvh - 170px);overflow-y:auto;background:var(--chat-bg);-webkit-overflow-scrolling:touch}
+.msg{max-width:82%;margin-bottom:10px;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.5;word-break:break-word;position:relative}
+.msg.other{background:var(--msg-other);border:1px solid var(--border);border-bottom-right-radius:4px;margin-left:auto}
+.msg.me{background:var(--msg-me);margin-right:auto;border-bottom-left-radius:4px}
+body:not(.dark) .msg.me{color:#111}
+.msg .name{font-weight:700;font-size:12px;color:var(--primary);margin-bottom:2px}
+.msg .time{font-size:10px;color:var(--text2);margin-top:3px;text-align:left;opacity:.8}
+.msg .msg-actions{display:none;position:absolute;top:4px;left:4px}
+.msg:hover .msg-actions,.msg.show-actions .msg-actions{display:flex;gap:4px}
+.chat-input-bar{position:fixed;bottom:62px;left:0;right:0;max-width:480px;margin:0 auto;background:var(--nav-bg);padding:8px 12px;display:flex;gap:8px;border-top:1px solid var(--border);z-index:150}
+@media(min-width:768px){.chat-input-bar{max-width:720px}}
+@media(min-width:1024px){.chat-input-bar{max-width:900px}}
+.chat-input-bar input{flex:1;padding:11px 14px;border:1px solid var(--border);border-radius:24px;outline:none;font-size:14px;background:var(--input-bg);color:var(--text);font-family:inherit}
+.chat-input-bar button{width:44px;height:44px;border-radius:50%;background:var(--primary2);color:#fff;border:none;font-size:18px;cursor:pointer;flex-shrink:0}
+
+/* Doctor */
+.doctor-card{background:var(--card);margin:0 14px 12px;border-radius:var(--radius);padding:14px;box-shadow:0 1px 4px var(--shadow);border:1px solid var(--border)}
+.doctor-top{display:flex;gap:12px;align-items:flex-start}
+.doctor-avatar{width:52px;height:52px;border-radius:50%;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+body.dark .doctor-avatar{background:#1a3a5c}
+.doctor-info h4{font-size:15px;font-weight:700;color:var(--text)}
+.doctor-info .spec{color:#42a5f5;font-size:12px;font-weight:600}
+.doctor-info .price{font-size:12px;color:var(--text2);margin-top:2px}
+.doctor-meta{margin-top:8px;font-size:12px;color:var(--text2)}
+.doctor-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+
+/* Rewards */
+.rewards-hero{background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#fff;padding:28px 20px;text-align:center;border-radius:0 0 24px 24px}
+.points-box{background:var(--card);margin:18px 16px;border-radius:var(--radius);padding:18px;text-align:center;box-shadow:0 4px 15px var(--shadow);border:1px solid var(--border)}
+.points-box .big{font-size:28px;font-weight:800;color:var(--primary)}
+.step{background:var(--card);margin:0 16px 10px;border-radius:var(--radius);padding:14px;display:flex;gap:12px;align-items:center;box-shadow:0 1px 4px var(--shadow);border:1px solid var(--border)}
+.step-icon{width:44px;height:44px;border-radius:12px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+
+/* More grid */
+.more-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.more-item{background:var(--card);border-radius:var(--radius);padding:18px 10px;text-align:center;box-shadow:0 1px 4px var(--shadow);cursor:pointer;border:1px solid var(--border);transition:transform .15s}
+.more-item:active{transform:scale(.96)}
+.more-item span{font-size:28px;display:block;margin-bottom:6px}
+.more-item p{font-size:13px;font-weight:600;color:var(--text)}
+
+/* Misc */
+.coming{background:#fff3e0;color:#e65100;padding:9px 14px;border-radius:var(--radius-sm);font-size:13px;margin:6px 16px;text-align:center}
+body.dark .coming{background:#3e2723;color:#ffab40}
+.empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:14px}
+.empty .empty-icon{font-size:48px;margin-bottom:12px;opacity:.6}
+.loading{text-align:center;padding:30px;color:var(--text2)}
+.fab{position:fixed;bottom:90px;left:18px;width:54px;height:54px;border-radius:50%;background:var(--warning);color:#fff;border:none;font-size:26px;box-shadow:0 4px 15px rgba(255,152,0,.4);z-index:150;cursor:pointer;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+.admin-badge{background:#c62828;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:6px}
+.rating-item{background:var(--input-bg);padding:11px;border-radius:var(--radius-sm);margin-bottom:8px}
+.rating-item .top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);background:#323232;color:#fff;padding:12px 22px;border-radius:25px;font-size:13px;z-index:999;opacity:0;transition:.3s;pointer-events:none;max-width:90%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.offer-card{margin:0 14px 12px;background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border);box-shadow:0 1px 4px var(--shadow)}
+.offer-card .free-badge{background:var(--danger);color:#fff;font-size:11px;padding:2px 8px;border-radius:8px;font-weight:700}
+.auth-page{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:center;padding:24px;background:var(--bg)}
+.auth-box{background:var(--card);border-radius:20px;padding:28px 20px;box-shadow:0 8px 30px var(--shadow);border:1px solid var(--border)}
+.auth-box h2{text-align:center;margin-bottom:6px;font-size:22px}
+.auth-box .sub{text-align:center;color:var(--text2);font-size:13px;margin-bottom:20px}
+.auth-tabs{display:flex;gap:8px;margin-bottom:18px}
+.auth-tabs button{flex:1;padding:10px;border:none;border-radius:var(--radius-sm);font-weight:700;cursor:pointer;background:var(--input-bg);color:var(--text);font-family:inherit;transition:background var(--transition)}
+.auth-tabs button.active{background:var(--primary);color:#fff}
+.person-card{display:flex;align-items:center;gap:12px;background:var(--card);margin:0 14px 10px;padding:12px;border-radius:12px;border:1px solid var(--border)}
+.person-avatar{width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
+
+/* Welcome banner */
+.welcome-banner{background:linear-gradient(135deg,#1b5e20,#388e3c);color:#fff;padding:16px 18px;margin:0 14px 12px;border-radius:var(--radius);display:flex;align-items:center;gap:12px}
+.welcome-banner .avatar{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
+.welcome-banner .avatar img{width:100%;height:100%;object-fit:cover}
+.welcome-banner .info{flex:1;min-width:0}
+.welcome-banner .info h3{font-size:15px;font-weight:700;margin-bottom:2px}
+.welcome-banner .info p{font-size:12px;opacity:.9}
+
+/* Quick shortcuts */
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 14px 14px}
+.quick-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 4px;text-align:center;cursor:pointer;transition:transform .15s}
+.quick-item:active{transform:scale(.95)}
+.quick-item span{font-size:24px;display:block;margin-bottom:4px}
+.quick-item p{font-size:11px;font-weight:600;color:var(--text);line-height:1.2}
+
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,var(--input-bg) 25%,var(--border) 50%,var(--input-bg) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton-card{margin:0 14px 12px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+.skeleton-img{height:120px}
+.skeleton-line{height:14px;margin:8px 14px;border-radius:4px}
+.skeleton-line.short{width:40%}
+.skeleton-line.med{width:70%}
+
+/* Offline bar */
+.offline-bar{display:none;background:#c62828;color:#fff;text-align:center;padding:8px;font-size:13px;position:sticky;top:0;z-index:300}
+.offline-bar.show{display:block}
+
+/* Profile */
+.profile-header{background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#fff;padding:28px 20px 40px;text-align:center;position:relative}
+.profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;border:3px solid rgba(255,255,255,.4)}
+.profile-avatar-lg img{width:100%;height:100%;object-fit:cover}
+.profile-stats{display:flex;justify-content:center;gap:24px;margin-top:12px}
+.profile-stats div{text-align:center}
+.profile-stats .num{font-size:18px;font-weight:800}
+.profile-stats .lbl{font-size:11px;opacity:.85}
+.profile-card{background:var(--card);margin:-24px 16px 16px;border-radius:var(--radius);padding:16px;box-shadow:0 4px 15px var(--shadow);border:1px solid var(--border);position:relative;z-index:2}
+.profile-menu-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.profile-menu-item:last-child{border-bottom:none}
+.profile-menu-item .icon{width:40px;height:40px;border-radius:10px;background:var(--input-bg);display:flex;align-items:center;justify-content:center;font-size:18px}
+.profile-menu-item .label{flex:1;font-weight:600;font-size:14px}
+.profile-menu-item .arrow{color:var(--text2);font-size:14px}
+
+/* Notif */
+.notif-item{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.notif-item:active{background:var(--input-bg)}
+.notif-item.unread{background:var(--primary-light)}
+.notif-item .n-icon{width:40px;height:40px;border-radius:50%;background:var(--input-bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.notif-item .n-body{flex:1;min-width:0}
+.notif-item .n-title{font-weight:600;font-size:13px;margin-bottom:2px}
+.notif-item .n-text{font-size:12px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.notif-item .n-time{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* Settings */
+.settings-group{margin:0 14px 16px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+.settings-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+.settings-item:last-child{border-bottom:none}
+.settings-item .s-label{font-size:14px;font-weight:600}
+.settings-item .s-desc{font-size:11px;color:var(--text2)}
+.toggle{width:48px;height:28px;background:var(--border);border-radius:14px;position:relative;transition:background .2s;cursor:pointer;flex-shrink:0}
+.toggle.on{background:var(--primary)}
+.toggle::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:3px;right:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(-20px)}
+
+/* Admin stats */
+.admin-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{background:var(--input-bg);border-radius:12px;padding:14px;text-align:center}
+.stat-card .stat-num{font-size:22px;font-weight:800;color:var(--primary)}
+.stat-card .stat-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* Filter chips */
+.filter-row{display:flex;gap:8px;padding:0 14px 10px;overflow-x:auto;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{white-space:nowrap;padding:6px 12px;border-radius:16px;background:var(--input-bg);font-size:12px;cursor:pointer;border:1px solid var(--border);font-weight:600;color:var(--text2);font-family:inherit}
+.filter-chip.active{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+
+/* Star rating display */
+.stars-display{color:#ffc107;letter-spacing:1px}
+
+/* Confirm dialog */
+.confirm-actions{display:flex;gap:8px;margin-top:16px}
+.confirm-actions .btn{flex:1;padding:12px}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* Accessibility */
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+/* Horizontal scroll sections */
+.h-scroll{display:flex;gap:10px;padding:0 14px 12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.h-scroll::-webkit-scrollbar{display:none}
+.h-card{min-width:140px;max-width:140px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;flex-shrink:0}
+.h-card .h-img{height:80px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:32px}
+.h-card .h-body{padding:8px}
+.h-card .h-name{font-size:12px;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3}
+.h-card .h-meta{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* Install prompt */
+.install-banner{display:none;background:var(--primary);color:#fff;padding:12px 16px;align-items:center;gap:12px;margin:0 14px 12px;border-radius:var(--radius)}
+.install-banner.show{display:flex}
+.install-banner p{flex:1;font-size:13px;font-weight:600}
+.install-banner button{background:rgba(255,255,255,.25);border:none;color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+<div class="offline-bar" id="offlineBar" role="alert">لا يوجد اتصال بالإنترنت — بعض الميزات قد لا تعمل</div>
+<div class="app" id="app">
+
+<!-- ========== AUTH ========== -->
+<div id="auth" class="page">
+  <div class="auth-page">
+    <div class="auth-box">
+      <div style="text-align:center;margin-bottom:12px">
+        <div class="logo-icon" style="margin:0 auto 8px;width:56px;height:56px;font-size:18px" aria-hidden="true">YMM</div>
+        <h2>YMM مصر في جيبك</h2>
+        <p class="sub">سجّل دخولك أو أنشئ حساب جديد</p>
+      </div>
+      <div class="auth-tabs" role="tablist">
+        <button class="active" id="tabLogin" role="tab" aria-selected="true" onclick="switchAuthTab('login')">تسجيل دخول</button>
+        <button id="tabRegister" role="tab" aria-selected="false" onclick="switchAuthTab('register')">إنشاء حساب</button>
+      </div>
+      <div id="loginForm">
+        <div class="form-group"><label for="loginEmail">البريد الإلكتروني</label><input type="email" id="loginEmail" placeholder="example@email.com" autocomplete="email" inputmode="email"></div>
+        <div class="form-group"><label for="loginPass">كلمة المرور</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
+        <button type="button" class="btn btn-outline btn-full" style="margin-bottom:8px;font-size:12px" onclick="doForgotPassword()">نسيت كلمة المرور؟</button>
+        <button class="btn btn-green btn-full" style="padding:13px" onclick="doLogin()" id="loginBtn">دخول</button>
+      </div>
+      <div id="registerForm" style="display:none">
+        <div class="form-group"><label for="regName">الاسم</label><input type="text" id="regName" placeholder="اسمك" autocomplete="name" maxlength="50"></div>
+        <div class="form-group"><label for="regEmail">البريد الإلكتروني</label><input type="email" id="regEmail" placeholder="example@email.com" autocomplete="email"></div>
+        <div class="form-group"><label for="regPass">كلمة المرور</label><input type="password" id="regPass" placeholder="6 أحرف على الأقل" autocomplete="new-password" minlength="6"></div>
+        <div class="form-group"><label for="regCity">المدينة / المنطقة</label><input type="text" id="regCity" placeholder="مثال: سوهاج - حي شرق" maxlength="80"></div>
+        <div class="form-group"><label for="regPhone">رقم الهاتف (اختياري)</label><input type="tel" id="regPhone" placeholder="01xxxxxxxxx" inputmode="tel" maxlength="15"></div>
+        <button class="btn btn-green btn-full" style="padding:13px;margin-top:8px" onclick="doRegister()" id="regBtn">إنشاء حساب</button>
+      </div>
+      <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--text2)">بالتسجيل أنت توافق على شروط الاستخدام وسياسة الخصوصية</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== HOME ========== -->
+<div id="home" class="page">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true">YMM</div>
+      <span>YMM مصر في جيبك</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="toggleDark()" title="الوضع المظلم" aria-label="تبديل الوضع المظلم">🌙</button>
+      <button class="icon-btn" onclick="showPage('notifications')" title="الإشعارات" aria-label="الإشعارات" id="notifBtn">🔔<span class="badge-dot" id="notifDot" style="display:none"></span></button>
+      <span class="user-chip" id="userChip" onclick="showPage('profile')" role="button" tabindex="0">ضيف</span>
+    </div>
+  </div>
+  <div class="search-bar">
+    <div class="search-box" id="searchBoxHome">
+      <span aria-hidden="true">🔍</span>
+      <input type="search" id="searchInput" placeholder="بحث عن خدمة، طبيب، عرض..." oninput="onSearchInput()" aria-label="بحث" autocomplete="off">
+      <button class="clear-btn" onclick="clearSearch()" aria-label="مسح البحث">✕</button>
+    </div>
+  </div>
+  <div class="install-banner" id="installBanner">
+    <p>ثبّت التطبيق للوصول السريع</p>
+    <button onclick="installPWA()">تثبيت</button>
+    <button onclick="dismissInstall()" style="background:transparent;opacity:.8">✕</button>
+  </div>
+  <div id="welcomeBanner" class="welcome-banner" style="display:none">
+    <div class="avatar" id="welcomeAvatar">👤</div>
+    <div class="info">
+      <h3 id="welcomeName">مرحباً</h3>
+      <p id="welcomeSub">اكتشف خدمات منطقتك</p>
+    </div>
+  </div>
+  <div class="quick-grid" id="quickGrid">
+    <div class="quick-item" onclick="setCategoryByName('مطعم');showPage('home')" role="button"><span>🍽️</span><p>مطاعم</p></div>
+    <div class="quick-item" onclick="showPage('doctors')" role="button"><span>👨‍⚕️</span><p>أطباء</p></div>
+    <div class="quick-item" onclick="setCategoryByName('صيدلية');showPage('home')" role="button"><span>💊</span><p>صيدليات</p></div>
+    <div class="quick-item" onclick="showPage('offers')" role="button"><span>🎁</span><p>عروض</p></div>
+    <div class="quick-item" onclick="setCategoryByName('خدمات اصلاح السيارات');showPage('home')" role="button"><span>🚗</span><p>سيارات</p></div>
+    <div class="quick-item" onclick="setCategoryByName('خدمات منزلية');showPage('home')" role="button"><span>🏠</span><p>منزلية</p></div>
+    <div class="quick-item" onclick="showPage('nearby')" role="button"><span>📍</span><p>قريب</p></div>
+    <div class="quick-item" onclick="showPage('favorites')" role="button"><span>❤️</span><p>مفضلة</p></div>
+  </div>
+  <div class="cats" id="catsBar" role="tablist">
+    <button class="cat active" data-cat="الكل" onclick="setCategory(this)" role="tab">الكل</button>
+    <button class="cat" data-cat="مطعم" onclick="setCategory(this)">مطعم</button>
+    <button class="cat" data-cat="محل خضار وفاكهة" onclick="setCategory(this)">خضار</button>
+    <button class="cat" data-cat="صيدلية" onclick="setCategory(this)">صيدلية</button>
+    <button class="cat" data-cat="خدمات اصلاح السيارات" onclick="setCategory(this)">سيارات</button>
+    <button class="cat" data-cat="خدمات منزلية" onclick="setCategory(this)">منزلية</button>
+    <button class="cat" data-cat="تعليمليم" onclick="setCategory(this)">تعليمليم</button>
+    <button class="cat" data-cat="تقنية" onclick="setCategory(this)">تقنية</button>
+    <button class="cat" data-cat="مواصلات" onclick="setCategory(this)">مواصلات</button>
+    <button class="cat" data-cat="طوارئ" onclick="setCategory(this)">طوارئ</button>
+    <button class="cat" data-cat="عروض مجانية" onclick="setCategory(this)">🎁 مجاني</button>
+    <button class="cat" data-cat="شركة" onclick="setCategory(this)">شركة</button>
+    <button class="cat" data-cat="أخرى" onclick="setCategory(this)">أخرى</button>
+  </div>
+  <div class="filter-row" id="sortBar">
+    <button class="filter-chip active" data-sort="newest" onclick="setSort(this)">الأحدث</button>
+    <button class="filter-chip" data-sort="rating" onclick="setSort(this)">الأعلى تقييماً</button>
+    <button class="filter-chip" data-sort="views" onclick="setSort(this)">الأكثر مشاهدة</button>
+    <button class="filter-chip" data-sort="nearby" onclick="setSort(this)">الأقرب</button>
+  </div>
+  <div class="section-title">⭐ الخدمات <button class="see-all" onclick="document.getElementById('searchInput').focus()">بحث متقدم</button></div>
+  <div id="servicesList"><div class="loading">جاري التحميل...</div></div>
+  <button class="fab" onclick="requireAuth(()=>showPage('add-service'))" aria-label="إضافة خدمة">+</button>
+</div>
+
+<!-- ========== SERVICE DETAILS ========== -->
+<div id="service-details" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="goBack()" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">تفاصيل الخدمة</h3>
+    <button class="icon-btn" id="svcFavBtn" onclick="toggleFavoriteCurrent()" aria-label="المفضلة">🤍</button>
+  </div>
+  <div id="serviceContent"></div>
+</div>
+
+<!-- ========== DOCTORS ========== -->
+<div id="doctors" class="page">
+  <div class="header" style="background:#00695c;color:#fff">
+    <div class="logo" style="color:#fff"><span>الأطباء</span></div>
+    <button class="btn btn-orange btn-sm" onclick="requireAuth(()=>showPage('add-doctor'))">+ إضافة</button>
+  </div>
+  <div class="search-bar">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="search" id="doctorSearch" placeholder="ابحث باسم الطبيب أو التخصص..." oninput="filterDoctors()" aria-label="بحث أطباء">
+    </div>
+  </div>
+  <div class="cats" id="docSpecs">
+    <button class="cat active" data-spec="" onclick="setDocSpec(this)">الكل</button>
+    <button class="cat" data-spec="نساء وتوليد" onclick="setDocSpec(this)">نساء</button>
+    <button class="cat" data-spec="أطفال" onclick="setDocSpec(this)">أطفال</button>
+    <button class="cat" data-spec="باطنة" onclick="setDocSpec(this)">باطنة</button>
+    <button class="cat" data-spec="جراحة" onclick="setDocSpec(this)">جراحة</button>
+    <button class="cat" data-spec="جلدية" onclick="setDocSpec(this)">جلدية</button>
+    <button class="cat" data-spec="عظام" onclick="setDocSpec(this)">عظام</button>
+    <button class="cat" data-spec="أسنان" onclick="setDocSpec(this)">أسنان</button>
+    <button class="cat" data-spec="عيون" onclick="setDocSpec(this)">عيون</button>
+    <button class="cat" data-spec="أنف وأذن" onclick="setDocSpec(this)">أنف وأذن</button>
+    <button class="cat" data-spec="قلب" onclick="setDocSpec(this)">قلب</button>
+  </div>
+  <div id="doctorsList"><div class="loading">جاري التحميل...</div></div>
+</div>
+
+<!-- ========== CHAT ========== -->
+<div id="chat" class="page">
+  <div class="chat-header">
+    <div style="width:40px;height:40px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px" aria-hidden="true">👥</div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:15px">غرفة دردشة YMM</div>
+      <div style="font-size:11px;color:#4caf50" id="chatStatus">عامة · متصلة</div>
+    </div>
+    <button class="icon-btn" onclick="showChatSearch()" title="بحث" aria-label="بحث في الدردشة">🔍</button>
+  </div>
+  <div class="chat-messages" id="chatBox" role="log" aria-live="polite"></div>
+  <div class="chat-input-bar">
+    <input type="text" id="chatInput" placeholder="اكتب رسالة..." maxlength="500" aria-label="رسالة" autocomplete="off">
+    <button onclick="sendMessage()" aria-label="إرسال">➤</button>
+  </div>
+</div>
+
+<!-- ========== MORE ========== -->
+<div id="more" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="showPage('home')" aria-label="إغلاق">✕</button>
+    <h3 style="font-size:15px;font-weight:700">المزيد</h3>
+    <button class="icon-btn" onclick="toggleDark()" aria-label="الوضع المظلم">🌙</button>
+  </div>
+  <div class="coming">استخراج جواز السفر (قريباً)</div>
+  <div class="coming">استخراج بطاقة الرقم القومي (قريباً)</div>
+  <div class="coming">استخراج شهادة الميلاد (قريباً)</div>
+  <div class="more-grid">
+    <div class="more-item" onclick="showPage('offers')" role="button"><span>🎁</span><p>عروض مجانية</p></div>
+    <div class="more-item" onclick="showPage('rewards')" role="button"><span>💰</span><p>برنامج النقاط</p></div>
+    <div class="more-item" onclick="showPage('nearby')" role="button"><span>👥</span><p>أشخاص قريبين</p></div>
+    <div class="more-item" onclick="showPage('favorites')" role="button"><span>❤️</span><p>المفضلة</p></div>
+    <div class="more-item" onclick="showPage('notifications')" role="button"><span>🔔</span><p>الإشعارات</p></div>
+    <div class="more-item" onclick="showPage('settings')" role="button"><span>⚙️</span><p>الإعدادات</p></div>
+    <div class="more-item" onclick="window.open('https://socialcreator.com/youznet','_blank')" role="button"><span>📮</span><p>بوابة الشكاوي</p></div>
+    <div class="more-item" onclick="showToast('قريباً إن شاء الله')" role="button"><span>🏘️</span><p>قري YMM</p></div>
+    <div class="more-item" onclick="showToast('قريباً إن شاء الله')" role="button"><span>🏠</span><p>سوق العقارات</p></div>
+    <div class="more-item" onclick="showToast('قريباً إن شاء الله')" role="button"><span>🎮</span><p>لعبة عبقري</p></div>
+    <div class="more-item" onclick="showPage('help')" role="button"><span>❓</span><p>المساعدة</p></div>
+    <div class="more-item" onclick="showPage('profile')" role="button"><span>👤</span><p>حسابي</p></div>
+  </div>
+  <div style="padding:12px 16px">
+    <button class="btn btn-outline btn-full" style="margin-bottom:8px" onclick="window.open('https://socialcreator.com/youznet','_blank')">ℹ️ من نحن</button>
+    <button class="btn btn-outline btn-full" style="margin-bottom:8px" onclick="window.open('https://socialcreator.com/youznet','_blank')">📞 اتصل بنا</button>
+    <button class="btn btn-outline btn-full" style="margin-bottom:8px" onclick="showPage('privacy')">🔒 سياسة الخصوصية</button>
+    <button class="btn btn-outline btn-full" onclick="shareApp()">📤 مشاركة التطبيق</button>
+  </div>
+</div>
+
+<!-- ========== FAVORITES ========== -->
+<div id="favorites" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="goBack()" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">❤️ المفضلة</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div id="favoritesList"><div class="loading">جاري التحميل...</div></div>
+</div>
+
+<!-- ========== NOTIFICATIONS ========== -->
+<div id="notifications" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="goBack()" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">الإشعارات</h3>
+    <button class="btn btn-sm btn-outline" onclick="markAllNotifsRead()">قراءة الكل</button>
+  </div>
+  <div id="notifsList"><div class="loading">جاري التحميل...</div></div>
+</div>
+
+<!-- ========== SETTINGS ========== -->
+<div id="settings" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="goBack()" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">الإعدادات</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div style="padding:16px 0">
+    <div class="settings-group">
+      <div class="settings-item" onclick="toggleDark()">
+        <div><div class="s-label">الوضع المظلم</div><div class="s-desc">تغيير مظهر التطبيق</div></div>
+        <div class="toggle" id="darkToggle"></div>
+      </div>
+      <div class="settings-item">
+        <div><div class="s-label">حجم الخط</div><div class="s-desc">افتراضي</div></div>
+        <select id="fontSizeSelect" onchange="setFontSize(this.value)" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-family:inherit">
+          <option value="1">عادي</option>
+          <option value="1.1">كبير</option>
+          <option value="1.2">أكبر</option>
+        </select>
+      </div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-item" onclick="clearSearchHistory()">
+        <div><div class="s-label">مسح سجل البحث</div><div class="s-desc">حذف عمليات البحث المحلية</div></div>
+        <span style="color:var(--text2)">🗑️</span>
+      </div>
+      <div class="settings-item" onclick="requestLocation()">
+        <div><div class="s-label">الموقع الجغرافي</div><div class="s-desc" id="locStatus">غير مفعّل</div></div>
+        <span style="color:var(--text2)">📍</span>
+      </div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-item" onclick="showPage('help')"><div class="s-label">مركز المساعدة</div><span>❓</span></div>
+      <div class="settings-item" onclick="showPage('privacy')"><div class="s-label">سياسة الخصوصية</div><span>🔒</span></div>
+      <div class="settings-item" onclick="showPage('terms')"><div class="s-label">شروط الاستخدام</div><span>📄</span></div>
+      <div class="settings-item" onclick="window.open('https://socialcreator.com/youznet','_blank')"><div class="s-label">تواصل معنا</div><span>📞</span></div>
+    </div>
+    <div style="padding:0 16px;margin-top:8px;text-align:center;color:var(--text2);font-size:12px">
+      الإصدار 2.0.0 · YMM مصر في جيبك
+    </div>
+  </div>
+</div>
+
+<!-- ========== HELP ========== -->
+<div id="help" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="goBack()" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">المساعدة</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div style="padding:16px">
+    <div class="settings-group">
+      <div class="settings-item" onclick="toggleFaq(this)"><div class="s-label">كيف أضيف خدمة؟</div><span>▼</span></div>
+      <div class="faq-answer" style="display:none;padding:0 16px 12px;font-size:13px;color:var(--text2)">من الصفحة الرئيسية اضغط زر + ثم املأ البيانات واحفظ. يجب تسجيل الدخول أولاً.</div>
+      <div class="settings-item" onclick="toggleFaq(this)"><div class="s-label">كيف أحصل على نقاط؟</div><span>▼</span></div>
+      <div class="faq-answer" style="display:none;padding:0 16px 12px;font-size:13px;color:var(--text2)">كل خدمة صالحة تضيفها تساوي نقطة واحدة (5 ج.م). راجع صفحة برنامج النقاط.</div>
+      <div class="settings-item" onclick="toggleFaq(this)"><div class="s-label">كيف أبلّغ عن محتوى مخالف؟</div><span>▼</span></div>
+      <div class="faq-answer" style="display:none;padding:0 16px 12px;font-size:13px;color:var(--text2)">من صفحة تفاصيل الخدمة اضغط «إبلاغ» وأرسل السبب.</div>
+      <div class="settings-item" onclick="toggleFaq(this)"><div class="s-label">هل بياناتي آمنة؟</div><span>▼</span></div>
+      <div class="faq-answer" style="display:none;padding:0 16px 12px;font-size:13px;color:var(--text2)">نستخدم Firebase من Google. لا نخزّن كلمات المرور. راجع سياسة الخصوصية.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PRIVACY / TERMS ========== -->
+<div id="privacy" class="page">
+  <div class="header"><button class="icon-btn" onclick="goBack()">→</button><h3 style="font-size:15px;font-weight:700">سياسة الخصوصية</h3><div style="width:36px"></div></div>
+  <div style="padding:16px;font-size:13px;line-height:1.8;color:var(--text2)">
+    <p>يجمع تطبيق YMM مصر في جيبك بيانات الحساب (الاسم، البريد، المدينة) لتحسين تجربة الخدمات المحلية. لا نبيع بياناتك لأطراف ثالثة. الموقع الجغرافي يُطلب بموافقتك فقط ولا يُخزَّن بدقة عالية إلا عند الحاجة. يمكنك طلب حذف حسابك من صفحة الحساب.</p>
+  </div>
+</div>
+<div id="terms" class="page">
+  <div class="header"><button class="icon-btn" onclick="goBack()">→</button><h3 style="font-size:15px;font-weight:700">شروط الاستخدام</h3><div style="width:36px"></div></div>
+  <div style="padding:16px;font-size:13px;line-height:1.8;color:var(--text2)">
+    <p>باستخدامك للتطبيق توافق على عدم نشر محتوى مخالف أو مسيء، وعدم انتحال الهوية. الإدارة تحتفظ بحق حذف المحتوى المخالف وتعطيل الحسابات. المعلومات المقدمة من المستخدمين ولا نضمن دقتها الكاملة.</p>
+  </div>
+</div>
+
+<!-- ========== OFFERS ========== -->
+<div id="offers" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="showPage('more')" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">🎁 عروض مجانية</h3>
+    <button class="btn btn-orange btn-sm" onclick="requireAuth(()=>showPage('add-offer'))">+ عرض</button>
+  </div>
+  <div style="padding:12px 16px;font-size:13px;color:var(--text2)">عروض وهدايا مجانية من التجار لأهل المنطقة</div>
+  <div id="offersList"><div class="loading">جاري التحميل...</div></div>
+</div>
+
+<!-- ========== ADD OFFER ========== -->
+<div id="add-offer" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="showPage('offers')" aria-label="إغلاق">✕</button>
+    <h3 style="font-size:15px;font-weight:700">إضافة عرض مجاني</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div style="padding:16px">
+    <div class="form-group"><label for="offerTitle">عنوان العرض *</label><input type="text" id="offerTitle" placeholder="مثال: كوب قهوة مجاني" maxlength="80"></div>
+    <div class="form-group"><label for="offerDesc">وصف العرض *</label><textarea id="offerDesc" rows="3" placeholder="تفاصيل العرض وشروطه" maxlength="500"></textarea></div>
+    <div class="form-group"><label for="offerShop">اسم المحل / التاجر *</label><input type="text" id="offerShop" placeholder="اسم المكان" maxlength="80"></div>
+    <div class="form-group"><label for="offerAddress">العنوان</label><input type="text" id="offerAddress" placeholder="العنوان" maxlength="120"></div>
+    <div class="form-group"><label for="offerPhone">رقم التواصل</label><input type="tel" id="offerPhone" placeholder="01xxxxxxxxx" maxlength="15"></div>
+    <div class="form-group"><label for="offerExpiry">صالح حتى (اختياري)</label><input type="date" id="offerExpiry"></div>
+    <button class="btn btn-green btn-full" style="padding:14px;margin-top:8px" onclick="saveOffer()">نشر العرض المجاني</button>
+  </div>
+</div>
+
+<!-- ========== NEARBY ========== -->
+<div id="nearby" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="showPage('more')" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">👥 أشخاص قريبين</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div style="padding:12px 16px;font-size:13px;color:var(--text2)">مستخدمون في منطقتك (حسب المدينة المسجلة)</div>
+  <div id="nearbyList"><div class="loading">جاري التحميل...</div></div>
+</div>
+
+<!-- ========== PROFILE ========== -->
+<div id="profile" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="goBack()" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">حسابي</h3>
+    <button class="icon-btn" onclick="showPage('edit-profile')" aria-label="تعديل">✏️</button>
+  </div>
+  <div class="profile-header">
+    <div class="profile-avatar-lg" id="profileAvatarLg">👤</div>
+    <div style="font-weight:700;font-size:18px" id="profileName">—</div>
+    <div style="font-size:13px;opacity:.9;margin-top:4px" id="profileEmail">—</div>
+    <div style="font-size:12px;opacity:.85;margin-top:2px" id="profileCity">—</div>
+    <div class="profile-stats">
+      <div><div class="num" id="statServices">0</div><div class="lbl">خدماتي</div></div>
+      <div><div class="num" id="statFavs">0</div><div class="lbl">مفضلة</div></div>
+      <div><div class="num" id="statPoints">0</div><div class="lbl">نقاط</div></div>
+    </div>
+  </div>
+  <div class="profile-card">
+    <div class="profile-menu-item" onclick="showPage('edit-profile')"><div class="icon">✏️</div><div class="label">تعديل الحساب</div><div class="arrow">←</div></div>
+    <div class="profile-menu-item" onclick="showPage('favorites')"><div class="icon">❤️</div><div class="label">المفضلة</div><div class="arrow">←</div></div>
+    <div class="profile-menu-item" onclick="showPage('my-services')"><div class="icon">🏪</div><div class="label">خدماتي</div><div class="arrow">←</div></div>
+    <div class="profile-menu-item" onclick="showPage('settings')"><div class="icon">⚙️</div><div class="label">الإعدادات</div><div class="arrow">←</div></div>
+    <div class="profile-menu-item" onclick="doChangePassword()"><div class="icon">🔑</div><div class="label">تغيير كلمة المرور</div><div class="arrow">←</div></div>
+    <div class="profile-menu-item" id="adminMenuItem" style="display:none" onclick="showPage('admin')"><div class="icon">🛡️</div><div class="label">لوحة الإدارة</div><div class="arrow">←</div></div>
+    <div class="profile-menu-item" onclick="confirmDeleteAccount()"><div class="icon">🗑️</div><div class="label" style="color:var(--danger)">حذف الحساب</div><div class="arrow">←</div></div>
+    <div class="profile-menu-item" onclick="doLogout()"><div class="icon">🚪</div><div class="label">تسجيل الخروج</div><div class="arrow">←</div></div>
+  </div>
+</div>
+
+<!-- ========== EDIT PROFILE ========== -->
+<div id="edit-profile" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="showPage('profile')" aria-label="إغلاق">✕</button>
+    <h3 style="font-size:15px;font-weight:700">تعديل الحساب</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div style="padding:16px">
+    <div class="form-group"><label for="editName">الاسم</label><input type="text" id="editName" maxlength="50"></div>
+    <div class="form-group"><label for="editCity">المدينة / المنطقة</label><input type="text" id="editCity" maxlength="80"></div>
+    <div class="form-group"><label for="editPhone">الهاتف</label><input type="tel" id="editPhone" maxlength="15"></div>
+    <div class="form-group"><label for="editAvatar">رابط صورة الحساب (اختياري)</label><input type="url" id="editAvatar" placeholder="https://..."></div>
+    <button class="btn btn-green btn-full" style="padding:14px" onclick="saveProfile()">حفظ التعديلات</button>
+  </div>
+</div>
+
+<!-- ========== MY SERVICES ========== -->
+<div id="my-services" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="showPage('profile')" aria-label="رجوع">→</button>
+    <h3 style="font-size:15px;font-weight:700">خدماتي</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div id="myServicesList"><div class="loading">جاري التحميل...</div></div>
+</div>
+
+<!-- ========== REWARDS ========== -->
+<div id="rewards" class="page">
+  <div class="rewards-hero">
+    <div style="font-size:36px;margin-bottom:6px">💰</div>
+    <h2>برنامج مكافآت الخدمات</h2>
+    <p style="opacity:.9;font-size:13px">حوّل مجهودك إلى أرباح حقيقية</p>
+  </div>
+  <div class="points-box">
+    <div style="font-size:13px;color:var(--text2)">كل خدمة تضيفها تساوي</div>
+    <div class="big">1 نقطة = 5 ج.م</div>
+    <div style="margin-top:8px;font-size:13px;color:var(--text2)">رصيدك: <strong id="userPointsDisplay">0</strong> نقطة</div>
+  </div>
+  <div class="step"><div class="step-icon">✏️</div><div><div style="font-weight:700;font-size:14px">أضف خدمتك</div><div style="font-size:12px;color:var(--text2)">أضف تفاصيل دقيقة</div></div></div>
+  <div class="step"><div class="step-icon">💎</div><div><div style="font-weight:700;font-size:14px">اكسب النقاط</div><div style="font-size:12px;color:var(--text2)">نقطة لكل خدمة صالحة</div></div></div>
+  <div class="step"><div class="step-icon">📱</div><div><div style="font-weight:700;font-size:14px">اسحب أرباحك</div><div style="font-size:12px;color:var(--text2)">عبر المحفظة الإلكترونية</div></div></div>
+  <div style="background:#fff8e1;margin:14px 16px;padding:12px;border-radius:12px;font-size:12px;line-height:1.7;color:#5d4037">
+    ⚠️ الحد الأدنى: 500 جنيه · التحويل عبر فودافون كاش · المراجعة 24-48 ساعة
+  </div>
+  <div style="padding:0 16px 20px">
+    <button class="btn btn-green btn-full" style="padding:14px" onclick="showToast('أضف خدمات أولاً ثم تواصل معنا عبر بوابة الشكاوي')">اشترك الآن</button>
+  </div>
+</div>
+
+<!-- ========== ADD SERVICE ========== -->
+<div id="add-service" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="showPage('home')" aria-label="إغلاق">✕</button>
+    <h3 style="font-size:15px;font-weight:700">إضافة خدمة جديدة</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div style="padding:16px">
+    <div class="form-group"><label for="svcName">اسم المكان / الخدمة *</label><input type="text" id="svcName" placeholder="اسم المكان" maxlength="100"></div>
+    <div class="form-group"><label for="svcCategory">الفئة *</label>
+      <select id="svcCategory">
+        <option value="">اختر الفئة</option>
+        <option>مطعم</option>
+        <option>محل خضار وفاكهة</option>
+        <option>صيدلية</option>
+        <option>خدمات اصلاح السيارات</option>
+        <option>خدمات منزلية</option>
+        <option>تعليمليم</option>
+        <option>تقنية</option>
+        <option>مواصلات</option>
+        <option>طوارئ</option>
+        <option>شركة</option>
+        <option>ملابس</option>
+        <option>عروض مجانية</option>
+        <option>أخرى</option>
+      </select>
+    </div>
+    <div class="form-group"><label for="svcCity">المدينة / الحي</label><input type="text" id="svcCity" placeholder="حي شرق - سوهاج" maxlength="80"></div>
+    <div class="form-group"><label for="svcAddress">العنوان بالتفصيل *</label><input type="text" id="svcAddress" placeholder="الشارع والعلامة" maxlength="150"></div>
+    <div class="form-group"><label for="svcPhone">رقم الهاتف *</label><input type="tel" id="svcPhone" placeholder="01xxxxxxxxx" maxlength="15"></div>
+    <div class="form-group"><label for="svcWhatsapp">واتساب</label><input type="tel" id="svcWhatsapp" placeholder="01xxxxxxxxx" maxlength="15"></div>
+    <div class="form-group"><label for="svcHours">ساعات العمل</label><input type="text" id="svcHours" placeholder="مثال: 9 ص - 11 م" maxlength="60"></div>
+    <div class="form-group"><label for="svcOwner">المسؤول</label><input type="text" id="svcOwner" placeholder="اسم المسؤول" maxlength="50"></div>
+    <div class="form-group"><label for="svcImage">رابط صورة</label><input type="url" id="svcImage" placeholder="https://..."></div>
+    <div class="form-group"><label for="svcDesc">وصف</label><textarea id="svcDesc" rows="2" maxlength="500"></textarea></div>
+    <div class="form-group"><label for="svcKeywords">كلمات مفتاحية (مفصولة بفاصلة)</label><input type="text" id="svcKeywords" placeholder="توصيل، مفتوح 24 ساعة" maxlength="120"></div>
+    <button class="btn btn-green btn-full" style="padding:14px;margin-top:8px" onclick="saveService()" id="saveSvcBtn">حفظ الخدمة</button>
+  </div>
+</div>
+
+<!-- ========== ADD DOCTOR ========== -->
+<div id="add-doctor" class="page">
+  <div class="header">
+    <button class="icon-btn" onclick="showPage('doctors')" aria-label="إغلاق">✕</button>
+    <h3 style="font-size:15px;font-weight:700">إضافة طبيب</h3>
+    <div style="width:36px"></div>
+  </div>
+  <div style="padding:16px">
+    <div class="form-group"><label for="docName">اسم الطبيب *</label><input type="text" id="docName" placeholder="د. الاسم" maxlength="80"></div>
+    <div class="form-group"><label for="docSpec">التخصص *</label>
+      <select id="docSpec">
+        <option value="">اختر</option>
+        <option>نساء وتوليد</option><option>أطفال</option><option>باطنة</option>
+        <option>جراحة</option><option>جلدية</option><option>عظام</option>
+        <option>أسنان</option><option>عيون</option><option>أنف وأذن</option>
+        <option>قلب</option><option>أخرى</option>
+      </select>
+    </div>
+    <div class="form-group"><label for="docPrice">سعر الكشف</label><input type="number" id="docPrice" placeholder="200" min="0" max="99999"></div>
+    <div class="form-group"><label for="docQual">المؤهلات</label><input type="text" id="docQual" maxlength="150"></div>
+    <div class="form-group"><label for="docAddress">العنوان *</label><input type="text" id="docAddress" maxlength="150"></div>
+    <div class="form-group"><label for="docPhone">الهاتف *</label><input type="tel" id="docPhone" maxlength="15"></div>
+    <div class="form-group"><label for="docWhatsapp">واتساب</label><input type="tel" id="docWhatsapp" maxlength="15"></div>
+    <div class="form-group"><label for="docHours">ساعات العمل</label><input type="text" id="docHours" maxlength="60"></div>
+    <button class="btn btn-green btn-full" style="padding:14px;margin-top:8px" onclick="saveDoctor()">حفظ</button>
+  </div>
+</div>
+
+<!-- ========== ADMIN ========== -->
+<div id="admin" class="page">
+  <div class="header" style="background:#b71c1c;color:#fff">
+    <div class="logo" style="color:#fff"><span class="admin-badge">ADMIN</span> الإدارة</div>
+    <button class="icon-btn" style="background:rgba(255,255,255,.2);color:#fff" onclick="showPage('home')" aria-label="خروج">✕</button>
+  </div>
+  <div style="padding:16px">
+    <div class="admin-stats" id="adminStats">
+      <div class="stat-card"><div class="stat-num" id="aStatSvc">—</div><div class="stat-lbl">خدمات</div></div>
+      <div class="stat-card"><div class="stat-num" id="aStatDoc">—</div><div class="stat-lbl">أطباء</div></div>
+      <div class="stat-card"><div class="stat-num" id="aStatOff">—</div><div class="stat-lbl">عروض</div></div>
+      <div class="stat-card"><div class="stat-num" id="aStatChat">—</div><div class="stat-lbl">رسائل</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-green btn-sm" onclick="adminTab('services')">خدمات</button>
+      <button class="btn btn-blue btn-sm" onclick="adminTab('doctors')">أطباء</button>
+      <button class="btn btn-orange btn-sm" onclick="adminTab('offers')">عروض</button>
+      <button class="btn btn-red btn-sm" onclick="adminTab('chats')">دردشة</button>
+      <button class="btn btn-outline btn-sm" onclick="adminTab('reports')">بلاغات</button>
+    </div>
+    <div id="adminContent"><div class="loading">...</div></div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav" id="bottomNav" style="display:none" role="navigation" aria-label="التنقل الرئيسي">
+  <button class="nav-item active" onclick="showPage('home')" aria-label="الرئيسية"><span>🏠</span>الرئيسية</button>
+  <button class="nav-item" onclick="showPage('doctors')" aria-label="الأطباء"><span>👨‍⚕️</span>الأطباء</button>
+  <button class="nav-item" onclick="showPage('chat')" aria-label="الدردشة"><span>💬</span>الدردشة</button>
+  <button class="nav-item" onclick="showPage('favorites')" aria-label="المفضلة"><span>❤️</span>مفضلة</button>
+  <button class="nav-item" onclick="showPage('more')" aria-label="المزيد"><span>☰</span>المزيد</button>
+</div>
+
+</div>
+
+<!-- Rate Modal -->
+<div class="modal-overlay" id="rateModal" role="dialog" aria-modal="true" aria-labelledby="rateTitle">
+  <div class="modal-box center">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title" id="rateTitle">⭐ أضف تقييمك</h3>
+    <div style="font-size:28px;margin:10px 0;text-align:center" id="starSelect" role="group" aria-label="التقييم بالنجوم">
+      <span onclick="setStars(1)" style="cursor:pointer" role="button" aria-label="نجمة واحدة">☆</span>
+      <span onclick="setStars(2)" style="cursor:pointer" role="button" aria-label="نجمتان">☆</span>
+      <span onclick="setStars(3)" style="cursor:pointer" role="button" aria-label="3 نجوم">☆</span>
+      <span onclick="setStars(4)" style="cursor:pointer" role="button" aria-label="4 نجوم">☆</span>
+      <span onclick="setStars(5)" style="cursor:pointer" role="button" aria-label="5 نجوم">☆</span>
+    </div>
+    <input type="text" id="rateName" placeholder="اسمك" maxlength="40">
+    <textarea id="rateComment" rows="3" placeholder="تعليقك..." maxlength="300"></textarea>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="closeRateModal()">إلغاء</button>
+      <button class="btn btn-green" onclick="submitRating()">إرسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal-overlay" id="reportModal" role="dialog" aria-modal="true">
+  <div class="modal-box center">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">الإبلاغ عن محتوى</h3>
+    <select id="reportReason">
+      <option value="">اختر السبب</option>
+      <option>معلومات خاطئة</option>
+      <option>محتوى مسيء</option>
+      <option>احتيال</option>
+      <option>تكرار / سبام</option>
+      <option>أخرى</option>
+    </select>
+    <textarea id="reportNote" rows="2" placeholder="تفاصيل إضافية (اختياري)" maxlength="300"></textarea>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="closeReportModal()">إلغاء</button>
+      <button class="btn btn-red" onclick="submitReport()">إرسال البلاغ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true">
+  <div class="modal-box center">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title" id="confirmTitle">تأكيد</h3>
+    <p id="confirmMsg" style="text-align:center;font-size:14px;color:var(--text2);margin-bottom:8px"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="closeConfirm()">إلغاء</button>
+      <button class="btn btn-red" id="confirmOkBtn">تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================================
+   YMM مصر في جيبك — v2.0
+   CONFIG · STATE · AUTH · NAV · SERVICES · SEARCH · FAVORITES
+   NOTIFICATIONS · CHAT · DOCTORS · OFFERS · RATINGS · ADMIN · PWA
+============================================================================ */
+
+// ========== CONFIG ==========
+const firebaseConfig = {
+  apiKey: "AIzaSyAyzKFtpqRl3SXJsvO9-RUEmWX-N0xFf9g",
+  authDomain: "ymm-fe-gepk.firebaseapp.com",
+  projectId: "ymm-fe-gepk",
+  storageBucket: "ymm-fe-gepk.firebasestorage.app",
+  messagingSenderId: "27343404468",
+  appId: "1:27343404468:web:3577196457ec36598346e1",
+  measurementId: "G-BSKGM754CW"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+const APP_VERSION = '2.0.0';
+const MAX_CHAT_LEN = 500;
+const MAX_MSG_PER_MIN = 8;
+const SEARCH_DEBOUNCE_MS = 280;
+const CHAT_LIMIT = 80;
+
+// ========== STATE ==========
+let currentUser = null;
+let userProfile = null;
+let currentCategory = 'الكل';
+let currentSort = 'newest';
+let currentDocSpec = '';
+let allServices = [];
+let allDoctors = [];
+let allOffers = [];
+let favorites = new Set();
+let isAdmin = false;
+let currentServiceId = null;
+let selectedStars = 0;
+let chatUnsub = null;
+let servicesUnsub = null;
+let doctorsUnsub = null;
+let offersUnsub = null;
+let notifsUnsub = null;
+let pageHistory = [];
+let lastPage = 'home';
+let userLat = null;
+let userLng = null;
+let searchTimer = null;
+let lastMsgTimes = [];
+let deferredInstallPrompt = null;
+let reportTarget = null;
+let confirmCallback = null;
+let online = navigator.onLine;
+
+// ========== UTILITIES ==========
+function esc(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function normalizeAr(str) {
+  if (!str) return '';
+  return String(str)
+    .toLowerCase()
+    .replace(/[إأآا]/g, 'ا')
+    .replace(/[ىي]/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function showToast(msg, ms) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), ms || 2500);
+}
+
+function isValidPhone(p) {
+  if (!p) return false;
+  const d = p.replace(/\D/g, '');
+  return d.length >= 10 && d.length <= 15;
+}
+
+function waLink(phone) {
+  if (!phone) return '#';
+  let d = phone.replace(/\D/g, '');
+  if (d.startsWith('0')) d = '2' + d;
+  else if (!d.startsWith('2')) d = '20' + d;
+  return 'https://wa.me/' + d;
+}
+
+function mapsLink(address) {
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address || '');
+}
+
+function formatTime(ts) {
+  try {
+    if (!ts) return '';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) { return ''; }
+}
+
+function formatDate(ts) {
+  try {
+    if (!ts) return '';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('ar-EG');
+  } catch (e) { return ''; }
+}
+
+function skeletonCards(n) {
+  let h = '';
+  for (let i = 0; i < n; i++) {
+    h += `<div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton skeleton-line med"></div><div class="skeleton skeleton-line short"></div></div>`;
+  }
+  return h;
+}
+
+function debounce(fn, ms) {
+  let t;
+  return function (...args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), ms);
+  };
+}
+
+// ========== ONLINE / OFFLINE ==========
+window.addEventListener('online', () => {
+  online = true;
+  document.getElementById('offlineBar').classList.remove('show');
+  showToast('عادت الاتصال بالإنترنت');
+});
+window.addEventListener('offline', () => {
+  online = false;
+  document.getElementById('offlineBar').classList.add('show');
+});
+if (!navigator.onLine) document.getElementById('offlineBar').classList.add('show');
+
+// ========== DARK MODE ==========
+if (localStorage.getItem('ymm_dark') === '1') {
+  document.body.classList.add('dark');
+}
+function toggleDark() {
+  document.body.classList.toggle('dark');
+  const on = document.body.classList.contains('dark');
+  localStorage.setItem('ymm_dark', on ? '1' : '0');
+  const tg = document.getElementById('darkToggle');
+  if (tg) tg.classList.toggle('on', on);
+}
+function updateDarkToggle() {
+  const tg = document.getElementById('darkToggle');
+  if (tg) tg.classList.toggle('on', document.body.classList.contains('dark'));
+}
+
+function setFontSize(v) {
+  document.documentElement.style.fontSize = (16 * parseFloat(v)) + 'px';
+  localStorage.setItem('ymm_font', v);
+}
+(function () {
+  const f = localStorage.getItem('ymm_font');
+  if (f) {
+    document.documentElement.style.fontSize = (16 * parseFloat(f)) + 'px';
+    const sel = document.getElementById('fontSizeSelect');
+    if (sel) sel.value = f;
+  }
+})();
+
+// ========== AUTH ==========
+function switchAuthTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('tabLogin').setAttribute('aria-selected', tab === 'login');
+  document.getElementById('tabRegister').setAttribute('aria-selected', tab === 'register');
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const city = document.getElementById('regCity').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  if (!name || !email || !pass) { showToast('املأ الحقول المطلوبة'); return; }
+  if (name.length < 2) { showToast('الاسم قصير جداً'); return; }
+  if (pass.length < 6) { showToast('كلمة المرور 6 أحرف على الأقل'); return; }
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true;
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await db.collection('users').doc(cred.user.uid).set({
+      name: name.slice(0, 50),
+      email,
+      city: city.slice(0, 80),
+      phone: phone.slice(0, 15),
+      role: 'user',
+      points: 0,
+      favorites: [],
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('تم إنشاء الحساب بنجاح ✓');
+  } catch (e) {
+    const map = {
+      'auth/email-already-in-use': 'البريد مستخدم مسبقاً',
+      'auth/invalid-email': 'بريد إلكتروني غير صالح',
+      'auth/weak-password': 'كلمة المرور ضعيفة'
+    };
+    showToast(map[e.code] || 'حدث خطأ أثناء التسجيل');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!email || !pass) { showToast('أدخل البريد وكلمة المرور'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    showToast('تم الدخول بنجاح');
+  } catch (e) {
+    showToast('بيانات الدخول غير صحيحة');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function doForgotPassword() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) { showToast('أدخل بريدك أولاً'); return; }
+  auth.sendPasswordResetEmail(email)
+    .then(() => showToast('تم إرسال رابط إعادة التعيين للبريد'))
+    .catch(() => showToast('تعذر إرسال الرابط — تحقق من البريد'));
+}
+
+function doLogout() {
+  cleanupListeners();
+  auth.signOut().then(() => showToast('تم تسجيل الخروج'));
+}
+
+function requireAuth(fn) {
+  if (!currentUser) {
+    showToast('يجب تسجيل الدخول أولاً');
+    showPage('auth');
+    return;
+  }
+  fn();
+}
+
+async function loadUserProfile(uid) {
+  try {
+    const doc = await db.collection('users').doc(uid).get();
+    if (doc.exists) {
+      userProfile = doc.data();
+      favorites = new Set(userProfile.favorites || []);
+      isAdmin = userProfile.role === 'admin';
+    } else {
+      userProfile = { name: currentUser.email, email: currentUser.email, role: 'user', favorites: [] };
+      favorites = new Set();
+      isAdmin = false;
+      await db.collection('users').doc(uid).set({
+        name: (currentUser.email || '').split('@')[0],
+        email: currentUser.email,
+        role: 'user',
+        points: 0,
+        favorites: [],
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+  } catch (e) {
+    userProfile = { name: currentUser.email, email: currentUser.email, role: 'user' };
+    isAdmin = false;
+  }
+}
+
+auth.onAuthStateChanged(async user => {
+  currentUser = user;
+  if (user) {
+    await loadUserProfile(user.uid);
+    const chip = document.getElementById('userChip');
+    if (chip) chip.textContent = (userProfile.name || user.email.split('@')[0] || 'مستخدم').slice(0, 12);
+    document.getElementById('bottomNav').style.display = 'flex';
+    const adminItem = document.getElementById('adminMenuItem');
+    if (adminItem) adminItem.style.display = isAdmin ? 'flex' : 'none';
+    updateProfileUI();
+    updateWelcome();
+    showPage('home');
+    loadServices();
+    loadDoctors();
+    loadFavoritesCount();
+    loadNotifs();
+  } else {
+    userProfile = null;
+    isAdmin = false;
+    favorites = new Set();
+    cleanupListeners();
+    document.getElementById('bottomNav').style.display = 'none';
+    showPage('auth');
+  }
+});
+
+function updateWelcome() {
+  const ban = document.getElementById('welcomeBanner');
+  if (!ban || !userProfile) return;
+  ban.style.display = 'flex';
+  document.getElementById('welcomeName').textContent = 'مرحباً، ' + (userProfile.name || 'مستخدم');
+  document.getElementById('welcomeSub').textContent = userProfile.city ? '📍 ' + userProfile.city : 'اكتشف خدمات منطقتك';
+  const av = document.getElementById('welcomeAvatar');
+  if (userProfile.avatar) {
+    av.innerHTML = `<img src="${esc(userProfile.avatar)}" alt="" onerror="this.parentElement.textContent='👤'">`;
+  } else {
+    av.textContent = (userProfile.name || '?')[0];
+  }
+}
+
+function updateProfileUI() {
+  if (!userProfile) return;
+  document.getElementById('profileName').textContent = userProfile.name || '—';
+  document.getElementById('profileEmail').textContent = userProfile.email || currentUser?.email || '—';
+  document.getElementById('profileCity').textContent = userProfile.city ? '📍 ' + userProfile.city : 'لم تحدد المدينة';
+  const pts = userProfile.points || 0;
+  document.getElementById('statPoints').textContent = pts;
+  const upd = document.getElementById('userPointsDisplay');
+  if (upd) upd.textContent = pts;
+  const av = document.getElementById('profileAvatarLg');
+  if (userProfile.avatar) {
+    av.innerHTML = `<img src="${esc(userProfile.avatar)}" alt="" onerror="this.parentElement.textContent='👤'">`;
+  } else {
+    av.textContent = (userProfile.name || '?')[0];
+  }
+  if (document.getElementById('editName')) {
+    document.getElementById('editName').value = userProfile.name || '';
+    document.getElementById('editCity').value = userProfile.city || '';
+    document.getElementById('editPhone').value = userProfile.phone || '';
+    document.getElementById('editAvatar').value = userProfile.avatar || '';
+  }
+}
+
+async function saveProfile() {
+  if (!currentUser) return;
+  const name = document.getElementById('editName').value.trim().slice(0, 50);
+  const city = document.getElementById('editCity').value.trim().slice(0, 80);
+  const phone = document.getElementById('editPhone').value.trim().slice(0, 15);
+  const avatar = document.getElementById('editAvatar').value.trim().slice(0, 300);
+  if (!name) { showToast('الاسم مطلوب'); return; }
+  try {
+    await db.collection('users').doc(currentUser.uid).update({ name, city, phone, avatar });
+    userProfile = { ...userProfile, name, city, phone, avatar };
+    updateProfileUI();
+    updateWelcome();
+    document.getElementById('userChip').textContent = name.slice(0, 12);
+    showToast('تم حفظ التعديلات ✓');
+    showPage('profile');
+  } catch (e) {
+    showToast('حدث خطأ أثناء الحفظ');
+  }
+}
+
+function doChangePassword() {
+  if (!currentUser?.email) { showToast('غير متاح'); return; }
+  auth.sendPasswordResetEmail(currentUser.email)
+    .then(() => showToast('تم إرسال رابط تغيير كلمة المرور لبريدك'))
+    .catch(() => showToast('تعذر الإرسال'));
+}
+
+function confirmDeleteAccount() {
+  openConfirm('حذف الحساب', 'هل أنت متأكد؟ سيتم حذف بيانات حسابك. هذا الإجراء لا يمكن التراجع عنه بسهولة.', async () => {
+    if (!currentUser) return;
+    try {
+      await db.collection('users').doc(currentUser.uid).delete().catch(() => {});
+      await currentUser.delete();
+      showToast('تم حذف الحساب');
+    } catch (e) {
+      showToast('أعد تسجيل الدخول ثم حاول مرة أخرى لحذف الحساب');
+    }
+  });
+}
+
+// ========== NAVIGATION ==========
+function showPage(id) {
+  if (lastPage && lastPage !== id) pageHistory.push(lastPage);
+  if (pageHistory.length > 20) pageHistory.shift();
+  lastPage = id;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById(id);
+  if (page) page.classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const map = {
+    home: 0, 'service-details': 0, 'add-service': 0,
+    doctors: 1, 'add-doctor': 1,
+    chat: 2,
+    favorites: 3, notifications: 3,
+    more: 4, rewards: 4, offers: 4, 'add-offer': 4, nearby: 4, profile: 4,
+    settings: 4, help: 4, privacy: 4, terms: 4, 'edit-profile': 4, 'my-services': 4
+  };
+  const idx = map[id];
+  if (idx !== undefined) {
+    const items = document.querySelectorAll('.nav-item');
+    if (items[idx]) items[idx].classList.add('active');
+  }
+  const hideNav = id === 'auth' || id === 'admin';
+  document.getElementById('bottomNav').style.display = hideNav ? 'none' : (currentUser ? 'flex' : 'none');
+
+  if (id === 'chat') loadChat();
+  else if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+
+  if (id === 'offers') loadOffers();
+  if (id === 'nearby') loadNearby();
+  if (id === 'favorites') renderFavorites();
+  if (id === 'notifications') renderNotifs();
+  if (id === 'admin' && isAdmin) { updateAdminStats(); adminTab('services'); }
+  if (id === 'profile') { updateProfileUI(); loadMyStats(); }
+  if (id === 'edit-profile') updateProfileUI();
+  if (id === 'my-services') renderMyServices();
+  if (id === 'settings') updateDarkToggle();
+  if (id === 'rewards' && userProfile) {
+    const el = document.getElementById('userPointsDisplay');
+    if (el) el.textContent = userProfile.points || 0;
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  const prev = pageHistory.pop();
+  if (prev && document.getElementById(prev)) showPage(prev);
+  else showPage('home');
+}
+
+// ========== SERVICES ==========
+function cleanupListeners() {
+  if (servicesUnsub) { servicesUnsub(); servicesUnsub = null; }
+  if (doctorsUnsub) { doctorsUnsub(); doctorsUnsub = null; }
+  if (offersUnsub) { offersUnsub(); offersUnsub = null; }
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  if (notifsUnsub) { notifsUnsub(); notifsUnsub = null; }
+}
+
+function loadServices() {
+  const list = document.getElementById('servicesList');
+  if (list) list.innerHTML = skeletonCards(4);
+  if (servicesUnsub) servicesUnsub();
+  servicesUnsub = db.collection('services').orderBy('createdAt', 'desc').limit(200).onSnapshot(
+    snap => {
+      allServices = [];
+      snap.forEach(doc => allServices.push({ id: doc.id, ...doc.data() }));
+      renderServices();
+    },
+    () => {
+      if (list) list.innerHTML = '<div class="empty"><div class="empty-icon">📡</div>تعذر تحميل البيانات<br>تحقق من اتصال الإنترنت</div>';
+    }
+  );
+}
+
+function renderServices() {
+  const list = document.getElementById('servicesList');
+  if (!list) return;
+  const q = normalizeAr(document.getElementById('searchInput')?.value || '');
+  let filtered = allServices.slice();
+
+  if (currentCategory !== 'الكل') {
+    filtered = filtered.filter(s => s.category === currentCategory);
+  }
+  if (q) {
+    filtered = filtered.filter(s => {
+      const blob = normalizeAr([s.name, s.address, s.city, s.category, s.phone, s.desc, s.keywords, s.owner].filter(Boolean).join(' '));
+      return blob.includes(q);
+    });
+  }
+
+  if (currentSort === 'rating') {
+    filtered.sort((a, b) => (b.ratingAvg || 0) - (a.ratingAvg || 0));
+  } else if (currentSort === 'views') {
+    filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+  } else if (currentSort === 'nearby' && userProfile?.city) {
+    const city = normalizeAr(userProfile.city);
+    filtered.sort((a, b) => {
+      const ac = normalizeAr(a.city || '').includes(city) ? 0 : 1;
+      const bc = normalizeAr(b.city || '').includes(city) ? 0 : 1;
+      return ac - bc;
+    });
+  }
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>لا توجد نتائج<br>جرّب بحثاً مختلفاً أو أضف خدمة</div>';
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  const wrap = document.createElement('div');
+  wrap.innerHTML = filtered.map(s => {
+    const rating = s.ratingAvg ? Number(s.ratingAvg).toFixed(1) : '—';
+    const count = s.ratingCount || 0;
+    const isFav = favorites.has(s.id);
+    const img = s.image
+      ? `<img src="${esc(s.image)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.insertAdjacentText('afterbegin','🏪')">`
+      : '🏪';
+    return `<div class="service-card" onclick="openService('${esc(s.id)}')" role="button" tabindex="0">
+      <div class="service-img">${img}
+        ${s.city ? `<div class="badge">${esc(s.city)}</div>` : ''}
+        <button class="fav-btn" onclick="event.stopPropagation();toggleFavorite('${esc(s.id)}')" aria-label="مفضلة">${isFav ? '❤️' : '🤍'}</button>
+      </div>
+      <div class="service-body">
+        <div class="service-rating">★ ${rating} (${count})</div>
+        <div class="service-name">${esc(s.name)}</div>
+        <div class="service-meta">📂 ${esc(s.category || '')}</div>
+        <div class="service-meta">📍 ${esc(s.address || '')}</div>
+        ${s.phone ? `<div class="service-meta">📞 ${esc(s.phone)}</div>` : ''}
+        ${s.views ? `<div class="service-meta">👁 ${s.views}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  list.innerHTML = wrap.innerHTML;
+}
+
+function setCategory(btn) {
+  document.querySelectorAll('#catsBar .cat').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  currentCategory = btn.dataset.cat;
+  renderServices();
+}
+function setCategoryByName(name) {
+  currentCategory = name;
+  document.querySelectorAll('#catsBar .cat').forEach(c => {
+    c.classList.toggle('active', c.dataset.cat === name);
+  });
+  renderServices();
+}
+function setSort(btn) {
+  document.querySelectorAll('#sortBar .filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  currentSort = btn.dataset.sort;
+  renderServices();
+}
+
+const onSearchInput = debounce(() => {
+  const box = document.getElementById('searchBoxHome');
+  const v = document.getElementById('searchInput')?.value || '';
+  if (box) box.classList.toggle('has-value', !!v.trim());
+  if (v.trim()) saveSearchHistory(v.trim());
+  renderServices();
+}, SEARCH_DEBOUNCE_MS);
+
+function clearSearch() {
+  const inp = document.getElementById('searchInput');
+  if (inp) inp.value = '';
+  document.getElementById('searchBoxHome')?.classList.remove('has-value');
+  renderServices();
+}
+
+function saveSearchHistory(q) {
+  try {
+    let h = JSON.parse(localStorage.getItem('ymm_search_hist') || '[]');
+    h = h.filter(x => x !== q);
+    h.unshift(q);
+    localStorage.setItem('ymm_search_hist', JSON.stringify(h.slice(0, 15)));
+  } catch (e) {}
+}
+function clearSearchHistory() {
+  localStorage.removeItem('ymm_search_hist');
+  showToast('تم مسح سجل البحث');
+}
+
+async function openService(id) {
+  currentServiceId = id;
+  const s = allServices.find(x => x.id === id);
+  if (!s) { showToast('الخدمة غير موجودة'); return; }
+
+  // Increment views (fire and forget)
+  db.collection('services').doc(id).update({
+    views: firebase.firestore.FieldValue.increment(1)
+  }).catch(() => {});
+
+  const rating = s.ratingAvg ? Number(s.ratingAvg).toFixed(1) : '—';
+  const count = s.ratingCount || 0;
+  const isFav = favorites.has(id);
+  const favBtn = document.getElementById('svcFavBtn');
+  if (favBtn) favBtn.textContent = isFav ? '❤️' : '🤍';
+
+  let ratingsHtml = (s.ratings && s.ratings.length)
+    ? s.ratings.slice().reverse().slice(0, 30).map(r =>
+      `<div class="rating-item">
+        <div class="top"><span>👤 ${esc(r.name || 'مستخدم')}</span><span class="stars-display">${'★'.repeat(r.stars || 0)}${'☆'.repeat(5 - (r.stars || 0))}</span></div>
+        <div style="font-size:13px">${esc(r.comment || '')}</div>
+        ${r.at ? `<div style="font-size:11px;color:var(--text2);margin-top:4px">${formatDate(r.at)}</div>` : ''}
+      </div>`).join('')
+    : '<div class="empty" style="padding:16px">لا توجد تقييمات بعد</div>';
+
+  const canEdit = currentUser && (s.uid === currentUser.uid || isAdmin);
+
+  document.getElementById('serviceContent').innerHTML = `
+    <div style="padding:16px">
+      ${s.image ? `<div style="height:180px;border-radius:12px;overflow:hidden;margin-bottom:12px;background:var(--input-bg)"><img src="${esc(s.image)}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'"></div>` : ''}
+      <div class="service-rating">★ ${rating} (${count})</div>
+      <h2 style="font-size:18px;margin:8px 0;font-weight:700">${esc(s.name)}</h2>
+      <div class="service-meta">📂 ${esc(s.category || '')}</div>
+      ${s.city ? `<div class="service-meta">📍 ${esc(s.city)}</div>` : ''}
+      <div class="service-meta">📍 ${esc(s.address || '')}</div>
+      ${s.phone ? `<div class="service-meta">📞 <a href="tel:${esc(s.phone)}" style="color:#1976d2">${esc(s.phone)}</a></div>` : ''}
+      ${s.whatsapp ? `<div class="service-meta">💬 <a href="${waLink(s.whatsapp)}" target="_blank" rel="noopener" style="color:#25d366">${esc(s.whatsapp)}</a></div>` : ''}
+      ${s.hours ? `<div class="service-meta">🕐 ${esc(s.hours)}</div>` : ''}
+      ${s.owner ? `<div class="service-meta">👤 ${esc(s.owner)}</div>` : ''}
+      ${s.desc ? `<div style="margin-top:10px;font-size:14px;line-height:1.6">${esc(s.desc)}</div>` : ''}
+      ${s.views ? `<div class="service-meta" style="margin-top:8px">👁 ${s.views} مشاهدة · 📤 ${s.shares || 0} مشاركة</div>` : ''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 8px">
+        ${s.phone ? `<a class="btn btn-call btn-sm" href="tel:${esc(s.phone)}">اتصال</a>` : ''}
+        ${s.whatsapp ? `<a class="btn btn-whatsapp btn-sm" href="${waLink(s.whatsapp)}" target="_blank" rel="noopener">واتساب</a>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="openMaps('${esc(s.address || s.city || '')}')">خريطة</button>
+        <button class="btn btn-outline btn-sm" onclick="shareService('${esc(s.id)}')">مشاركة</button>
+        <button class="btn btn-outline btn-sm" onclick="copyServiceInfo('${esc(s.id)}')">نسخ</button>
+      </div>
+      <button class="btn btn-green btn-full" style="margin:8px 0" onclick="openRateModal()">⭐ أضف تقييم</button>
+      <button class="btn btn-outline btn-full" style="margin:4px 0" onclick="openReportModal('service','${esc(s.id)}')">🚩 إبلاغ</button>
+      ${canEdit ? `<button class="btn btn-red btn-full" style="margin:8px 0" onclick="confirmDeleteService('${esc(s.id)}')">حذف الخدمة</button>` : ''}
+      <h3 style="margin:16px 0 8px;font-size:15px">التقييمات</h3>
+      ${ratingsHtml}
+    </div>`;
+  showPage('service-details');
+}
+
+function openMaps(address) {
+  if (!address) { showToast('لا يوجد عنوان'); return; }
+  window.open(mapsLink(address), '_blank', 'noopener');
+}
+
+function shareService(id) {
+  const s = allServices.find(x => x.id === id);
+  if (!s) return;
+  const text = `${s.name}\n📍 ${s.address || ''}\n📞 ${s.phone || ''}\nمن تطبيق YMM مصر في جيبك`;
+  if (navigator.share) {
+    navigator.share({ title: s.name, text }).catch(() => copyText(text));
+  } else {
+    copyText(text);
+  }
+  db.collection('services').doc(id).update({ shares: firebase.firestore.FieldValue.increment(1) }).catch(() => {});
+}
+
+function copyServiceInfo(id) {
+  const s = allServices.find(x => x.id === id);
+  if (!s) return;
+  copyText(`${s.name}\n📍 ${s.address || ''}\n📞 ${s.phone || ''}`);
+}
+
+function copyText(text) {
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('تم النسخ')).catch(() => showToast(text));
+  } else {
+    showToast('انسخ يدوياً: ' + text.slice(0, 60));
+  }
+}
+
+function shareApp() {
+  const text = 'جرّب تطبيق YMM مصر في جيبك — دليل الخدمات المحلية';
+  if (navigator.share) navigator.share({ title: 'YMM مصر في جيبك', text }).catch(() => copyText(text));
+  else copyText(text);
+}
+
+async function saveService() {
+  if (!currentUser) { showToast('سجّل دخولك أولاً'); return; }
+  const name = document.getElementById('svcName').value.trim();
+  const category = document.getElementById('svcCategory').value;
+  const address = document.getElementById('svcAddress').value.trim();
+  const phone = document.getElementById('svcPhone').value.trim();
+  if (!name || !category || !address || !phone) { showToast('املأ الحقول المطلوبة'); return; }
+  if (!isValidPhone(phone)) { showToast('رقم الهاتف غير صالح'); return; }
+  const btn = document.getElementById('saveSvcBtn');
+  btn.disabled = true;
+  try {
+    await db.collection('services').add({
+      name: name.slice(0, 100),
+      category,
+      address: address.slice(0, 150),
+      phone: phone.slice(0, 15),
+      city: document.getElementById('svcCity').value.trim().slice(0, 80),
+      whatsapp: document.getElementById('svcWhatsapp').value.trim().slice(0, 15),
+      hours: document.getElementById('svcHours').value.trim().slice(0, 60),
+      owner: document.getElementById('svcOwner').value.trim().slice(0, 50),
+      image: document.getElementById('svcImage').value.trim().slice(0, 300),
+      desc: document.getElementById('svcDesc').value.trim().slice(0, 500),
+      keywords: document.getElementById('svcKeywords').value.trim().slice(0, 120),
+      uid: currentUser.uid,
+      ratingAvg: 0,
+      ratingCount: 0,
+      ratings: [],
+      views: 0,
+      shares: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // Award point
+    await db.collection('users').doc(currentUser.uid).update({
+      points: firebase.firestore.FieldValue.increment(1)
+    }).catch(() => {});
+    if (userProfile) userProfile.points = (userProfile.points || 0) + 1;
+    showToast('تم إضافة الخدمة ✓');
+    // Clear form
+    ['svcName','svcCity','svcAddress','svcPhone','svcWhatsapp','svcHours','svcOwner','svcImage','svcDesc','svcKeywords'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('svcCategory').value = '';
+    showPage('home');
+  } catch (e) {
+    showToast('حدث خطأ أثناء الحفظ');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function confirmDeleteService(id) {
+  openConfirm('حذف الخدمة', 'هل تريد حذف هذه الخدمة نهائياً؟', () => deleteService(id));
+}
+
+async function deleteService(id) {
+  try {
+    await db.collection('services').doc(id).delete();
+    showToast('تم الحذف');
+    showPage('home');
+  } catch (e) {
+    showToast('ليس لديك صلاحية أو حدث خطأ');
+  }
+}
+
+// ========== RATINGS ==========
+function openRateModal() {
+  if (!currentUser) { showToast('سجّل دخولك للتقييم'); return; }
+  const s = allServices.find(x => x.id === currentServiceId);
+  if (s?.ratings?.some(r => r.uid === currentUser.uid)) {
+    showToast('قيّمت هذه الخدمة مسبقاً');
+    return;
+  }
+  selectedStars = 0;
+  updateStars();
+  document.getElementById('rateName').value = userProfile?.name || '';
+  document.getElementById('rateComment').value = '';
+  document.getElementById('rateModal').classList.add('show');
+}
+function closeRateModal() { document.getElementById('rateModal').classList.remove('show'); }
+function setStars(n) { selectedStars = n; updateStars(); }
+function updateStars() {
+  document.querySelectorAll('#starSelect span').forEach((s, i) => {
+    s.textContent = i < selectedStars ? '★' : '☆';
+  });
+}
+async function submitRating() {
+  if (selectedStars < 1) { showToast('اختر النجوم'); return; }
+  if (!currentUser || !currentServiceId) return;
+  const name = (document.getElementById('rateName').value.trim() || 'مستخدم').slice(0, 40);
+  const comment = document.getElementById('rateComment').value.trim().slice(0, 300);
+  const s = allServices.find(x => x.id === currentServiceId);
+  if (!s) return;
+  if (s.ratings?.some(r => r.uid === currentUser.uid)) {
+    showToast('قيّمت مسبقاً');
+    closeRateModal();
+    return;
+  }
+  const ratings = Array.isArray(s.ratings) ? s.ratings.slice() : [];
+  ratings.push({ name, comment, stars: selectedStars, uid: currentUser.uid, at: Date.now() });
+  const avg = ratings.reduce((a, r) => a + (r.stars || 0), 0) / ratings.length;
+  try {
+    await db.collection('services').doc(currentServiceId).update({
+      ratings,
+      ratingAvg: Math.round(avg * 10) / 10,
+      ratingCount: ratings.length
+    });
+    showToast('شكراً لتقييمك');
+    closeRateModal();
+    // Refresh local
+    s.ratings = ratings;
+    s.ratingAvg = Math.round(avg * 10) / 10;
+    s.ratingCount = ratings.length;
+    openService(currentServiceId);
+  } catch (e) {
+    showToast('حدث خطأ أثناء إرسال التقييم');
+  }
+}
+
+// ========== FAVORITES ==========
+async function toggleFavorite(id) {
+  if (!currentUser) { showToast('سجّل دخولك أولاً'); return; }
+  if (favorites.has(id)) {
+    favorites.delete(id);
+  } else {
+    favorites.add(id);
+  }
+  try {
+    await db.collection('users').doc(currentUser.uid).update({
+      favorites: Array.from(favorites)
+    });
+    if (userProfile) userProfile.favorites = Array.from(favorites);
+    renderServices();
+    if (currentServiceId === id) {
+      const btn = document.getElementById('svcFavBtn');
+      if (btn) btn.textContent = favorites.has(id) ? '❤️' : '🤍';
+    }
+    if (document.getElementById('favorites')?.classList.contains('active')) renderFavorites();
+    loadFavoritesCount();
+  } catch (e) {
+    showToast('تعذر تحديث المفضلة');
+  }
+}
+function toggleFavoriteCurrent() {
+  if (currentServiceId) toggleFavorite(currentServiceId);
+}
+function loadFavoritesCount() {
+  const el = document.getElementById('statFavs');
+  if (el) el.textContent = favorites.size;
+}
+function renderFavorites() {
+  const list = document.getElementById('favoritesList');
+  if (!list) return;
+  const items = allServices.filter(s => favorites.has(s.id));
+  if (!items.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">❤️</div>لا توجد عناصر في المفضلة<br>اضغط القلب على أي خدمة لحفظها</div>';
+    return;
+  }
+  list.innerHTML = items.map(s => {
+    const rating = s.ratingAvg ? Number(s.ratingAvg).toFixed(1) : '—';
+    return `<div class="service-card" onclick="openService('${esc(s.id)}')">
+      <div class="service-body">
+        <div class="service-rating">★ ${rating}</div>
+        <div class="service-name">${esc(s.name)}</div>
+        <div class="service-meta">📂 ${esc(s.category || '')}</div>
+        <div class="service-meta">📍 ${esc(s.address || '')}</div>
+        <button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="event.stopPropagation();toggleFavorite('${esc(s.id)}')">إزالة من المفضلة</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ========== DOCTORS ==========
+function loadDoctors() {
+  if (doctorsUnsub) doctorsUnsub();
+  doctorsUnsub = db.collection('doctors').orderBy('createdAt', 'desc').limit(150).onSnapshot(snap => {
+    allDoctors = [];
+    snap.forEach(doc => allDoctors.push({ id: doc.id, ...doc.data() }));
+    renderDoctors();
+  }, () => {
+    const list = document.getElementById('doctorsList');
+    if (list) list.innerHTML = '<div class="empty">تعذر التحميل</div>';
+  });
+}
+
+function setDocSpec(btn) {
+  document.querySelectorAll('#docSpecs .cat').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  currentDocSpec = btn.dataset.spec || '';
+  renderDoctors();
+}
+
+function renderDoctors() {
+  const list = document.getElementById('doctorsList');
+  if (!list) return;
+  const q = normalizeAr(document.getElementById('doctorSearch')?.value || '');
+  let filtered = allDoctors;
+  if (currentDocSpec) filtered = filtered.filter(d => d.spec === currentDocSpec);
+  if (q) {
+    filtered = filtered.filter(d => normalizeAr([d.name, d.spec, d.address, d.qual].filter(Boolean).join(' ')).includes(q));
+  }
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">👨‍⚕️</div>لا يوجد أطباء</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(d => `
+    <div class="doctor-card">
+      <div class="doctor-top">
+        <div class="doctor-avatar">👨‍⚕️</div>
+        <div class="doctor-info">
+          <h4>${esc(d.name)}</h4>
+          <div class="spec">${esc(d.spec || '')}</div>
+          ${d.price ? `<div class="price">الكشف: ${esc(String(d.price))} ج</div>` : ''}
+        </div>
+      </div>
+      <div class="doctor-meta">📍 ${esc(d.address || '')}</div>
+      ${d.hours ? `<div class="doctor-meta">🕐 ${esc(d.hours)}</div>` : ''}
+      ${d.qual ? `<div class="doctor-meta">🎓 ${esc(d.qual)}</div>` : ''}
+      <div class="doctor-actions">
+        ${d.whatsapp ? `<a class="btn btn-whatsapp btn-sm" href="${waLink(d.whatsapp)}" target="_blank" rel="noopener">واتساب</a>` : ''}
+        ${d.phone ? `<a class="btn btn-call btn-sm" href="tel:${esc(d.phone)}">اتصال</a>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="openMaps('${esc(d.address || '')}')">خريطة</button>
+        ${isAdmin || (currentUser && d.uid === currentUser.uid) ? `<button class="btn btn-red btn-sm" onclick="confirmDeleteDoctor('${esc(d.id)}')">حذف</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+function filterDoctors() { renderDoctors(); }
+
+async function saveDoctor() {
+  if (!currentUser) { showToast('سجّل دخولك'); return; }
+  const name = document.getElementById('docName').value.trim();
+  const spec = document.getElementById('docSpec').value;
+  const address = document.getElementById('docAddress').value.trim();
+  const phone = document.getElementById('docPhone').value.trim();
+  if (!name || !spec || !address || !phone) { showToast('املأ الحقول المطلوبة'); return; }
+  try {
+    await db.collection('doctors').add({
+      name: name.slice(0, 80),
+      spec,
+      address: address.slice(0, 150),
+      phone: phone.slice(0, 15),
+      price: document.getElementById('docPrice').value.trim(),
+      qual: document.getElementById('docQual').value.trim().slice(0, 150),
+      whatsapp: document.getElementById('docWhatsapp').value.trim().slice(0, 15),
+      hours: document.getElementById('docHours').value.trim().slice(0, 60),
+      uid: currentUser.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('تم إضافة الطبيب ✓');
+    showPage('doctors');
+  } catch (e) {
+    showToast('حدث خطأ أثناء الحفظ');
+  }
+}
+function confirmDeleteDoctor(id) {
+  openConfirm('حذف الطبيب', 'تأكيد الحذف؟', () => deleteDoctor(id));
+}
+async function deleteDoctor(id) {
+  try {
+    await db.collection('doctors').doc(id).delete();
+    showToast('تم الحذف');
+  } catch (e) {
+    showToast('تعذر الحذف');
+  }
+}
+
+// ========== OFFERS ==========
+function loadOffers() {
+  const list = document.getElementById('offersList');
+  if (list) list.innerHTML = skeletonCards(3);
+  if (offersUnsub) offersUnsub();
+  offersUnsub = db.collection('offers').orderBy('createdAt', 'desc').limit(100).onSnapshot(snap => {
+    allOffers = [];
+    const now = new Date().toISOString().slice(0, 10);
+    snap.forEach(doc => {
+      const o = { id: doc.id, ...doc.data() };
+      if (o.expiry && o.expiry < now) return; // hide expired
+      allOffers.push(o);
+    });
+    if (!allOffers.length) {
+      list.innerHTML = '<div class="empty"><div class="empty-icon">🎁</div>لا توجد عروض مجانية حالياً</div>';
+      return;
+    }
+    list.innerHTML = allOffers.map(o => `
+      <div class="offer-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span class="free-badge">مجاني</span>
+          ${o.expiry ? `<span style="font-size:11px;color:var(--text2)">حتى ${esc(o.expiry)}</span>` : ''}
+        </div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px">${esc(o.title)}</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:6px">${esc(o.desc || '')}</div>
+        <div style="font-size:12px">🏪 ${esc(o.shop || '')}</div>
+        ${o.address ? `<div style="font-size:12px;color:var(--text2)">📍 ${esc(o.address)}</div>` : ''}
+        ${o.phone ? `<div style="font-size:12px"><a href="tel:${esc(o.phone)}" style="color:#1976d2">📞 ${esc(o.phone)}</a></div>` : ''}
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <button class="btn btn-outline btn-sm" onclick="copyText('${esc(o.title)} - ${esc(o.shop || '')}')">نسخ</button>
+          ${isAdmin || (currentUser && o.uid === currentUser.uid) ? `<button class="btn btn-red btn-sm" onclick="confirmDeleteOffer('${esc(o.id)}')">حذف</button>` : ''}
+        </div>
+      </div>`).join('');
+  }, () => {
+    if (list) list.innerHTML = '<div class="empty">تعذر التحميل</div>';
+  });
+}
+
+async function saveOffer() {
+  if (!currentUser) { showToast('سجّل دخولك'); return; }
+  const title = document.getElementById('offerTitle').value.trim();
+  const desc = document.getElementById('offerDesc').value.trim();
+  const shop = document.getElementById('offerShop').value.trim();
+  if (!title || !desc || !shop) { showToast('املأ الحقول المطلوبة'); return; }
+  try {
+    await db.collection('offers').add({
+      title: title.slice(0, 80),
+      desc: desc.slice(0, 500),
+      shop: shop.slice(0, 80),
+      address: document.getElementById('offerAddress').value.trim().slice(0, 120),
+      phone: document.getElementById('offerPhone').value.trim().slice(0, 15),
+      expiry: document.getElementById('offerExpiry').value || '',
+      uid: currentUser.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('تم نشر العرض ✓');
+    showPage('offers');
+  } catch (e) {
+    showToast('حدث خطأ أثناء الحفظ');
+  }
+}
+function confirmDeleteOffer(id) {
+  openConfirm('حذف العرض', 'تأكيد؟', () => deleteOffer(id));
+}
+async function deleteOffer(id) {
+  try {
+    await db.collection('offers').doc(id).delete();
+    showToast('تم الحذف');
+  } catch (e) {
+    showToast('تعذر الحذف');
+  }
+}
+
+// ========== NEARBY ==========
+function loadNearby() {
+  const list = document.getElementById('nearbyList');
+  if (!list) return;
+  list.innerHTML = '<div class="loading">جاري التحميل...</div>';
+  const myCity = normalizeAr(userProfile?.city || '');
+  db.collection('users').limit(50).get().then(snap => {
+    const people = [];
+    snap.forEach(doc => {
+      if (doc.id === currentUser?.uid) return;
+      const u = doc.data();
+      if (!myCity || !u.city) {
+        people.push(u);
+      } else if (normalizeAr(u.city).includes(myCity) || myCity.includes(normalizeAr(u.city))) {
+        people.push(u);
+      }
+    });
+    if (!people.length) {
+      list.innerHTML = '<div class="empty"><div class="empty-icon">👥</div>لا يوجد أشخاص في منطقتك حالياً<br>ادعُ أصدقاءك للتسجيل!</div>';
+      return;
+    }
+    list.innerHTML = people.map(u => `
+      <div class="person-card">
+        <div class="person-avatar">${esc((u.name || '?')[0])}</div>
+        <div>
+          <div style="font-weight:700;font-size:14px">${esc(u.name || 'مستخدم')}</div>
+          <div style="font-size:12px;color:var(--text2)">${u.city ? '📍 ' + esc(u.city) : 'لم يحدد المدينة'}</div>
+        </div>
+      </div>`).join('');
+  }).catch(() => {
+    list.innerHTML = '<div class="empty">تعذر التحميل</div>';
+  });
+}
+
+// ========== CHAT ==========
+function loadChat() {
+  const box = document.getElementById('chatBox');
+  if (!box) return;
+  if (chatUnsub) chatUnsub();
+  document.getElementById('chatStatus').textContent = online ? 'عامة · متصلة' : 'غير متصل';
+  chatUnsub = db.collection('chats').orderBy('createdAt', 'asc').limitToLast(CHAT_LIMIT).onSnapshot(snap => {
+    box.innerHTML = '';
+    snap.forEach(doc => {
+      const m = doc.data();
+      const isMe = currentUser && m.uid === currentUser.uid;
+      const div = document.createElement('div');
+      div.className = 'msg ' + (isMe ? 'me' : 'other');
+      div.dataset.id = doc.id;
+      const time = formatTime(m.createdAt);
+      div.innerHTML = `${!isMe ? `<div class="name">${esc(m.sender || 'زائر')}</div>` : ''}${esc(m.text)}<div class="time">${time}</div>`;
+      if (isMe) {
+        div.addEventListener('dblclick', () => confirmDeleteChat(doc.id));
+      }
+      box.appendChild(div);
+    });
+    box.scrollTop = box.scrollHeight;
+  }, () => {
+    document.getElementById('chatStatus').textContent = 'خطأ في الاتصال';
+  });
+}
+
+function basicFilter(text) {
+  const bad = ['كس ام', 'شرموط', 'عرص', 'نيك', 'متناك'];
+  const lower = text.toLowerCase();
+  for (const w of bad) {
+    if (lower.includes(w)) return false;
+  }
+  return true;
+}
+
+async function sendMessage() {
+  if (!currentUser) { showToast('سجّل دخولك للدردشة'); return; }
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (text.length > MAX_CHAT_LEN) { showToast('الرسالة طويلة جداً'); return; }
+  if (!basicFilter(text)) { showToast('لا يمكن إرسال هذه الرسالة'); return; }
+
+  // Rate limit
+  const now = Date.now();
+  lastMsgTimes = lastMsgTimes.filter(t => now - t < 60000);
+  if (lastMsgTimes.length >= MAX_MSG_PER_MIN) {
+    showToast('أرسلت رسائل كثيرة — انتظر قليلاً');
+    return;
+  }
+  lastMsgTimes.push(now);
+
+  try {
+    await db.collection('chats').add({
+      text: text.slice(0, MAX_CHAT_LEN),
+      sender: (userProfile?.name || currentUser.email.split('@')[0] || 'مستخدم').slice(0, 40),
+      uid: currentUser.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    input.value = '';
+  } catch (e) {
+    showToast('تعذر إرسال الرسالة');
+  }
+}
+document.getElementById('chatInput')?.addEventListener('keypress', e => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+function showChatSearch() {
+  const q = prompt('بحث في الرسائل الظاهرة:');
+  if (!q) return;
+  const nq = normalizeAr(q);
+  document.querySelectorAll('#chatBox .msg').forEach(el => {
+    const t = normalizeAr(el.textContent);
+    el.style.outline = t.includes(nq) ? '2px solid var(--primary)' : 'none';
+  });
+}
+
+function confirmDeleteChat(id) {
+  openConfirm('حذف الرسالة', 'حذف رسالتك؟', async () => {
+    try {
+      await db.collection('chats').doc(id).delete();
+      showToast('تم الحذف');
+    } catch (e) {
+      showToast('تعذر الحذف');
+    }
+  });
+}
+
+// ========== REPORTS ==========
+function openReportModal(type, id) {
+  if (!currentUser) { showToast('سجّل دخولك أولاً'); return; }
+  reportTarget = { type, id };
+  document.getElementById('reportReason').value = '';
+  document.getElementById('reportNote').value = '';
+  document.getElementById('reportModal').classList.add('show');
+}
+function closeReportModal() {
+  document.getElementById('reportModal').classList.remove('show');
+  reportTarget = null;
+}
+async function submitReport() {
+  if (!reportTarget || !currentUser) return;
+  const reason = document.getElementById('reportReason').value;
+  if (!reason) { showToast('اختر السبب'); return; }
+  const note = document.getElementById('reportNote').value.trim().slice(0, 300);
+  try {
+    await db.collection('reports').add({
+      type: reportTarget.type,
+      targetId: reportTarget.id,
+      reason,
+      note,
+      uid: currentUser.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      status: 'open'
+    });
+    showToast('تم إرسال البلاغ — شكراً');
+    closeReportModal();
+  } catch (e) {
+    showToast('تعذر إرسال البلاغ');
+  }
+}
+
+// ========== NOTIFICATIONS ==========
+function loadNotifs() {
+  if (!currentUser) return;
+  if (notifsUnsub) notifsUnsub();
+  // Simple local + optional firestore collection
+  notifsUnsub = db.collection('notifications')
+    .where('uid', '==', currentUser.uid)
+    .orderBy('createdAt', 'desc')
+    .limit(40)
+    .onSnapshot(snap => {
+      window._notifs = [];
+      let unread = 0;
+      snap.forEach(doc => {
+        const n = { id: doc.id, ...doc.data() };
+        window._notifs.push(n);
+        if (!n.read) unread++;
+      });
+      const dot = document.getElementById('notifDot');
+      if (dot) dot.style.display = unread > 0 ? 'block' : 'none';
+      if (document.getElementById('notifications')?.classList.contains('active')) renderNotifs();
+    }, () => {
+      window._notifs = window._notifs || [];
+    });
+}
+
+function renderNotifs() {
+  const list = document.getElementById('notifsList');
+  if (!list) return;
+  const items = window._notifs || [];
+  if (!items.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🔔</div>لا توجد إشعارات</div>';
+    return;
+  }
+  list.innerHTML = items.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'}" onclick="markNotifRead('${esc(n.id)}')">
+      <div class="n-icon">${n.icon || '🔔'}</div>
+      <div class="n-body">
+        <div class="n-title">${esc(n.title || 'إشعار')}</div>
+        <div class="n-text">${esc(n.body || '')}</div>
+        <div class="n-time">${formatTime(n.createdAt)}</div>
+      </div>
+    </div>`).join('');
+}
+
+async function markNotifRead(id) {
+  try {
+    await db.collection('notifications').doc(id).update({ read: true });
+  } catch (e) {}
+}
+async function markAllNotifsRead() {
+  const items = (window._notifs || []).filter(n => !n.read);
+  if (!items.length) { showToast('لا يوجد جديد'); return; }
+  try {
+    const batch = db.batch();
+    items.forEach(n => batch.update(db.collection('notifications').doc(n.id), { read: true }));
+    await batch.commit();
+    showToast('تم تعليم الكل كمقروء');
+  } catch (e) {
+    showToast('تعذر التحديث');
+  }
+}
+
+// ========== LOCATION ==========
+function requestLocation() {
+  if (!navigator.geolocation) {
+    showToast('المتصفح لا يدعم الموقع');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+      document.getElementById('locStatus').textContent = 'مفعّل (تقريبي)';
+      showToast('تم تفعيل الموقع');
+      // Optional: reverse geocode via free API could be added later
+    },
+    () => {
+      document.getElementById('locStatus').textContent = 'مرفوض';
+      showToast('تم رفض إذن الموقع — يمكنك إدخال المدينة يدوياً في الحساب');
+    },
+    { enableHighAccuracy: false, timeout: 10000 }
+  );
+}
+
+// ========== MY SERVICES / STATS ==========
+function loadMyStats() {
+  if (!currentUser) return;
+  const mine = allServices.filter(s => s.uid === currentUser.uid);
+  document.getElementById('statServices').textContent = mine.length;
+  document.getElementById('statFavs').textContent = favorites.size;
+}
+function renderMyServices() {
+  const list = document.getElementById('myServicesList');
+  if (!list || !currentUser) return;
+  const mine = allServices.filter(s => s.uid === currentUser.uid);
+  if (!mine.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🏪</div>لم تضف خدمات بعد</div>';
+    return;
+  }
+  list.innerHTML = mine.map(s => `
+    <div class="service-card" onclick="openService('${esc(s.id)}')">
+      <div class="service-body">
+        <div class="service-name">${esc(s.name)}</div>
+        <div class="service-meta">${esc(s.category)} · ★ ${s.ratingAvg ? Number(s.ratingAvg).toFixed(1) : '—'}</div>
+        <button class="btn btn-red btn-sm" style="margin-top:8px" onclick="event.stopPropagation();confirmDeleteService('${esc(s.id)}')">حذف</button>
+      </div>
+    </div>`).join('');
+}
+
+// ========== ADMIN ==========
+function updateAdminStats() {
+  document.getElementById('aStatSvc').textContent = allServices.length;
+  document.getElementById('aStatDoc').textContent = allDoctors.length;
+  document.getElementById('aStatOff').textContent = allOffers.length;
+  document.getElementById('aStatChat').textContent = '—';
+}
+
+function adminTab(tab) {
+  if (!isAdmin) { showToast('ليس لديك صلاحية'); return; }
+  const content = document.getElementById('adminContent');
+  if (tab === 'services') {
+    content.innerHTML = allServices.length ? allServices.map(s => `
+      <div style="background:var(--input-bg);padding:10px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="min-width:0"><b>${esc(s.name)}</b><br><small>${esc(s.category)}</small></div>
+        <button class="btn btn-red btn-sm" onclick="confirmDeleteService('${esc(s.id)}')">حذف</button>
+      </div>`).join('') : '<div class="empty">فارغ</div>';
+  } else if (tab === 'doctors') {
+    content.innerHTML = allDoctors.length ? allDoctors.map(d => `
+      <div style="background:var(--input-bg);padding:10px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="min-width:0"><b>${esc(d.name)}</b><br><small>${esc(d.spec)}</small></div>
+        <button class="btn btn-red btn-sm" onclick="confirmDeleteDoctor('${esc(d.id)}')">حذف</button>
+      </div>`).join('') : '<div class="empty">فارغ</div>';
+  } else if (tab === 'offers') {
+    content.innerHTML = allOffers.length ? allOffers.map(o => `
+      <div style="background:var(--input-bg);padding:10px;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="min-width:0"><b>${esc(o.title)}</b><br><small>${esc(o.shop)}</small></div>
+        <button class="btn btn-red btn-sm" onclick="confirmDeleteOffer('${esc(o.id)}')">حذف</button>
+      </div>`).join('') : '<div class="empty">فارغ</div>';
+  } else if (tab === 'chats') {
+    db.collection('chats').orderBy('createdAt', 'desc').limit(40).get().then(snap => {
+      if (snap.empty) { content.innerHTML = '<div class="empty">فارغ</div>'; return; }
+      let html = '';
+      snap.forEach(doc => {
+        const m = doc.data();
+        html += `<div style="background:var(--input-bg);padding:8px;border-radius:8px;margin-bottom:5px;font-size:13px">
+          <b>${esc(m.sender)}</b>: ${esc(m.text)}
+          <button class="btn btn-red btn-sm" style="float:left" onclick="deleteChatAdmin('${esc(doc.id)}')">×</button>
+        </div>`;
+      });
+      content.innerHTML = html;
+    }).catch(() => { content.innerHTML = '<div class="empty">تعذر التحميل</div>'; });
+  } else if (tab === 'reports') {
+    db.collection('reports').orderBy('createdAt', 'desc').limit(30).get().then(snap => {
+      if (snap.empty) { content.innerHTML = '<div class="empty">لا توجد بلاغات</div>'; return; }
+      let html = '';
+      snap.forEach(doc => {
+        const r = doc.data();
+        html += `<div style="background:var(--input-bg);padding:10px;border-radius:8px;margin-bottom:6px;font-size:13px">
+          <b>${esc(r.type)}</b> · ${esc(r.reason)} · <small>${esc(r.status || '')}</small>
+          <div style="color:var(--text2);margin-top:4px">${esc(r.note || '')}</div>
+          <div style="margin-top:6px"><button class="btn btn-outline btn-sm" onclick="resolveReport('${esc(doc.id)}')">إغلاق</button></div>
+        </div>`;
+      });
+      content.innerHTML = html;
+    }).catch(() => { content.innerHTML = '<div class="empty">تعذر التحميل (قد تحتاج فهرس Firestore)</div>'; });
+  }
+}
+
+async function deleteChatAdmin(id) {
+  try {
+    await db.collection('chats').doc(id).delete();
+    adminTab('chats');
+  } catch (e) {
+    showToast('تعذر الحذف');
+  }
+}
+async function resolveReport(id) {
+  try {
+    await db.collection('reports').doc(id).update({ status: 'closed' });
+    showToast('تم الإغلاق');
+    adminTab('reports');
+  } catch (e) {
+    showToast('تعذر التحديث');
+  }
+}
+
+// ========== CONFIRM / FAQ ==========
+function openConfirm(title, msg, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  confirmCallback = cb;
+  document.getElementById('confirmModal').classList.add('show');
+  document.getElementById('confirmOkBtn').onclick = () => {
+    closeConfirm();
+    if (confirmCallback) confirmCallback();
+  };
+}
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('show');
+  confirmCallback = null;
+}
+
+function toggleFaq(el) {
+  const ans = el.nextElementSibling;
+  if (ans && ans.classList.contains('faq-answer')) {
+    ans.style.display = ans.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+// ========== PWA ==========
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (!localStorage.getItem('ymm_install_dismissed')) {
+    document.getElementById('installBanner')?.classList.add('show');
+  }
+});
+function installPWA() {
+  if (!deferredInstallPrompt) { showToast('التثبيت غير متاح حالياً'); return; }
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(() => {
+    deferredInstallPrompt = null;
+    document.getElementById('installBanner')?.classList.remove('show');
+  });
+}
+function dismissInstall() {
+  document.getElementById('installBanner')?.classList.remove('show');
+  localStorage.setItem('ymm_install_dismissed', '1');
+}
+
+/* Inline Service Worker — single file (no external sw.js needed) */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    var swCode = [
+      "const CACHE='ymm-v2-inline';",
+      "self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./']).catch(()=>{})));self.skipWaiting();});",
+      "self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});",
+      "self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;if(e.request.url.includes('firebase')||e.request.url.includes('googleapis')||e.request.url.includes('gstatic')){e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));return;}e.respondWith(caches.match(e.request).then(c=>{const f=fetch(e.request).then(r=>{if(r&&r.status===200&&e.request.url.startsWith(self.location.origin)){const cl=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,cl)).catch(()=>{});}return r;}).catch(()=>c);return c||f;}));});"
+    ].join('');
+    try {
+      var blob = new Blob([swCode], { type: 'application/javascript' });
+      var url = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(url).catch(function () {});
+    } catch (err) {}
+  });
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m) {
+      m.classList.remove('show');
+    }
+  });
+});
+
+// Keyboard: Escape closes modals
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
+  }
+});
+</script>
+</body>
+</html>
